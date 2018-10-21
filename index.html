@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+  <style>
+    :root {
+      --grid-maxWidth: 54rem; /* max container width 540px */
+    }
+    .card {
+      animation-name: slide-down;
+      animation-duration:  0.4s; 
+      animation-timing-function: ease;
+    }
+    .card:first-of-type {
+      margin-top: 1rem;
+    }
+    .button+.button {
+      margin-bottom: 1rem;
+    }
+    body {
+      overflow-y: scroll;
+    }
+    button {
+      cursor: pointer;
+    }
+    .container {
+      padding-bottom: 6rem;
+      animation: fade-in 0.4s ease;
+    }
+    .app > .nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: white;
+    }
+    .tabs > a, .tabs > a.active, .tabs > a:hover, .tabs > a.active:hover {
+      border-bottom-width: 6px;
+    }
+
+    @keyframes fade-in {
+      0% { opacity: 0;}
+      100% { opacity: 1;}
+    }
+
+    @keyframes slide-down {
+      0% { transform: translateY(-20px); }
+      100% { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import { app } from './hyperapp.mjs'
+    import * as actions from './actions.mjs'
+    import view from './view.mjs'
+    import state from './state.mjs' 
+    const main = app(state, actions, view, document.body)
+    main.welcome()
+    window.main = main
+  </script>
+</body>
+</html>
