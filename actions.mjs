@@ -1,5 +1,6 @@
 /* globals localStorage */
-import { hx, randomId, defer, icon } from './util.mjs'
+import { hx, randomId, defer, icon, stomachAdjectives,
+  stomachNouns, headAdjectives, headNouns, severities } from './util.mjs'
 
 const SECONDS = 1000
 const MINUTES = SECONDS * 60
@@ -173,19 +174,32 @@ export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addEn
 
 export const recordStomachAche = ({ callback } = {}) => async (_, { addChoice, addEntry, addMessage }) => {
   const entry = { time: Date.now() }
-  const severities = ['mild', 'medium', 'severe']
-  const nouns = ['bloating', 'constipation', 'diarrhea', 'cramps', 'heartburn']
-  const adjectives = ['bloated', 'constipated', 'diarrhea', 'cramped', 'heartburn']
   {
     const question = hx`<span>${icon('frown')} How does your stomach feel?`
-    const choice = await defer(callback => addChoice({ choices: adjectives, callback, question }))
-    entry.stomach = nouns[adjectives.indexOf(choice)]
+    const choice = await defer(callback => addChoice({ choices: stomachAdjectives, callback, question }))
+    entry.stomach = stomachNouns[stomachAdjectives.indexOf(choice)]
   }
   {
     const question = hx`<span>${icon('frown')} How bad is it?`
     entry.severity = await defer(callback => addChoice({ choices: severities, callback, question }))
   }
   addMessage(hx`<p class=card> Okay, I've added ${entry.severity} ${entry.stomach} to the records. </p>`)
+  addEntry(entry)
+  callback(entry)
+}
+
+export const recordHeadache = ({callback} = {}) => async(_, {addChoice, addEntry, addMessage}) => {
+  const entry = { time: Date.now() }
+  {
+    const question = hx`<span>${icon('frown')} How does your head feel?`
+    const choice = await defer(callback => addChoice({ choices: headAdjectives, callback, question }))
+    entry.head = headNouns[headAdjectives.indexOf(choice)]
+  }
+  {
+    const question = hx`<span>${icon('frown')} How bad is it?`
+    entry.severity = await defer(callback => addChoice({ choices: severities, callback, question }))
+    addMessage(hx`<p class=card> Okay, I've added ${entry.severity} ${entry.head} to the records. </p>`)
+  }
   addEntry(entry)
   callback(entry)
 }

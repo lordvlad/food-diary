@@ -61,6 +61,12 @@ export default (state, actions) => hx`
           ${e.drink.join(', ')} 
         </p>
       `}
+      ${!e.stomach ? '' : hx`
+        <p> ${icon('frown')} ${e.severity} ${e.stomach} </p>
+      `}
+      ${!e.head ? '' : hx`
+        <p> ${icon('frown')} ${e.severity} ${e.head} </p>
+      `}
     </p>`)}
   </div>
   <div class=nav>

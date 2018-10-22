@@ -21,3 +21,9 @@ export const drinkSizes = {
   two: 'two cups / glasses',
   bottle: 'one bottle'
 }
+
+export const severities = ['mild', 'medium', 'severe']
+export const stomachNouns = ['bloating', 'constipation', 'diarrhea', 'cramps', 'heartburn']
+export const stomachAdjectives = ['bloated', 'constipated', 'diarrhea', 'cramped', 'heartburn']
+export const headNouns = ['nausea', 'headaches']
+export const headAdjectives = ['nauseaus', 'aching']
