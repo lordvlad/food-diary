@@ -58,7 +58,23 @@
     import state from './state.mjs' 
     const main = app(state, actions, view, document.body)
     main.welcome()
-    window.main = main
+
+    function onKeyboardPop(callback) {
+      let lastWidth = window.innerWidth
+      let lastHeight = window.innerHeight
+      window.onresize = () => { 
+        if (window.innerWidth !== lastWidth) return
+        if (window.innerHeight < 0.9 * lastHeight) {
+          lastHeight = window.innerHeight
+          callback(true)
+        } else if (window.innerHeight > 1.1 * lastHeight) {
+          lastHeight = window.innerHeight
+          callback(false)
+        }
+      } 
+    }
+
+    onKeyboardPop(() => main.scrollToBottom())
   </script>
 </body>
 </html>
