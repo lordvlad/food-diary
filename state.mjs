@@ -12,6 +12,11 @@ const initialState = {
 }
 
 const stateJson = localStorage.getItem('app')
-const state = stateJson ? assign(JSON.parse(stateJson), { messages: [] }) : initialState
+const state = stateJson ? assign(JSON.parse(stateJson), {
+  messages: [],
+  diaryTab: false,
+  assistantTab: true,
+  optionsTab: false
+}) : initialState
 
 export default state
