@@ -136,15 +136,20 @@ export const askForFirstMeal = ({ callback }) => async (_, { recordMeal }) => {
   recordMeal({ callback, question })
 }
 
-export const recordEntry = ({ callback } = {}) => async (_, { addChoice, recordMeal, recordDrink, recordStomachAche, recordHeadache }) => {
+export const recordEntry = ({ callback } = {}) => async (_, actions) => {
+  const { addChoice, recordMeal, recordDrink, recordStomachAche, recordHeadache } = actions
   const question = hx`What do you want to record?`
   const choices = ['A meal', 'a drink', 'stomach ache', 'headache']
   const choice = await defer(callback => addChoice({ question, choices, callback }))
+  const cb = (...args) => {
+    if (callback) callback(...args) // eslint-disable-line 
+    actions.recordEntry()
+  }
   switch (choices.indexOf(choice)) {
-    case 0: recordMeal({ callback }); break
-    case 1: recordDrink({ callback }); break
-    case 2: recordStomachAche({ callback }); break
-    case 3: recordHeadache({ callback }); break
+    case 0: recordMeal({ callback: cb }); break
+    case 1: recordDrink({ callback: cb }); break
+    case 2: recordStomachAche({ callback: cb }); break
+    case 3: recordHeadache({ callback: cb }); break
   }
 }
 
@@ -166,11 +171,23 @@ export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addEn
   callback(entry)
 }
 
-export const recordStomachAche = ({ callback } = {}) => async (_, { addChoice, addEntry }) => {
-  const question = hx`<span>${icon('frown')} How does your stomach feel?`
-  const choices = ['bloated', 'constipated', 'diarrhea', 'cramps']
-  const stomach = await defer(callback => addChoice({ choices, callback, question }))
-  addEntry({ time: Date.now(), stomach })
+export const recordStomachAche = ({ callback } = {}) => async (_, { addChoice, addEntry, addMessage }) => {
+  const entry = { time: Date.now() }
+  const severities = ['mild', 'medium', 'severe']
+  const nouns = ['bloating', 'constipation', 'diarrhea', 'cramps', 'heartburn']
+  const adjectives = ['bloated', 'constipated', 'diarrhea', 'cramped', 'heartburn']
+  {
+    const question = hx`<span>${icon('frown')} How does your stomach feel?`
+    const choice = await defer(callback => addChoice({ choices: adjectives, callback, question }))
+    entry.stomach = nouns[adjectives.indexOf(choice)]
+  }
+  {
+    const question = hx`<span>${icon('frown')} How bad is it?`
+    entry.severity = await defer(callback => addChoice({ choices: severities, callback, question }))
+  }
+  addMessage(hx`<p class=card> Okay, I've added ${entry.severity} ${entry.stomach} to the records. </p>`)
+  addEntry(entry)
+  callback(entry)
 }
 
 export const recordMeal = ({ question, callback } = {}) => async (_, { addChoice, addQuestion, addEntry }) => {
@@ -225,6 +242,7 @@ export const recordMeal = ({ question, callback } = {}) => async (_, { addChoice
     entry.drinkSize = ['one', 'two', 'bottle'][choices.indexOf(choice)]
   }
 
+  addMessage(hx`<p class=card> Okay, I've added ${entry.foodType.join(', ')} ${!entry.drink ? '' : ' and ' + entry.drink.join(', ')} to the records. </p>`)
   addEntry(entry)
   callback(entry)
 }
