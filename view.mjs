@@ -42,7 +42,7 @@ export default (state, actions) => hx`
   </div>
   <div class="${state.diaryTab || hidden} container">
     <h4>${state.entries.length} entries</h4>
-    ${state.entries.map(e => hx`<div class=card>
+    ${state.entries.map(e => hx`<p class=card>
       <p>
         <b>${icon('clock')} ${fromNow(new Date(e.time).toString())} ago</b>
       </p>
@@ -61,7 +61,7 @@ export default (state, actions) => hx`
           ${e.drink.join(', ')} 
         </p>
       `}
-    </div>`)}
+    </p>`)}
   </div>
   <div class=nav>
     <div class=nav-left></div>
