@@ -51,30 +51,6 @@
   </style>
 </head>
 <body>
-  <script type="module">
-    import { app } from './hyperapp.mjs'
-    import * as actions from './actions.mjs'
-    import view from './view.mjs'
-    import state from './state.mjs' 
-    const main = app(state, actions, view, document.body)
-    main.welcome()
-
-    function onKeyboardPop(callback) {
-      let lastWidth = window.innerWidth
-      let lastHeight = window.innerHeight
-      window.onresize = () => { 
-        if (window.innerWidth !== lastWidth) return
-        if (window.innerHeight < 0.9 * lastHeight) {
-          lastHeight = window.innerHeight
-          callback(true)
-        } else if (window.innerHeight > 1.1 * lastHeight) {
-          lastHeight = window.innerHeight
-          callback(false)
-        }
-      } 
-    }
-
-    onKeyboardPop(() => main.scrollToBottom())
-  </script>
+  <script type="module" src="index.mjs"></script>
 </body>
 </html>

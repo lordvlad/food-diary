@@ -1,4 +1,4 @@
-import { h } from './hyperapp.mjs'
+import { h } from 'https://unpkg.com/hyperapp?module'
 import hyperx from './hyperx.mjs'
 
 export const hx = hyperx(h)
