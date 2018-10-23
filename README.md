@@ -11,3 +11,4 @@ Big shout out to 📢
 - fontawesome
 - [Icon pack by Icons8](https://icons8.com)
 - google workbox
+- zeit.co/now
