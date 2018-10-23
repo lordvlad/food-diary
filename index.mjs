@@ -23,3 +23,5 @@ function onKeyboardPop (fn) {
 onKeyboardPop(() => main.scrollToBottom())
 
 window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+window.addEventListener('online', () => main.setOffline(false))
+window.addEventListener('offline', () => main.setOffline(true))

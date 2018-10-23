@@ -17,6 +17,8 @@ let saveTimeout = null
 
 export const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight)
 
+export const setOffline = (offline) => ({ offline })
+
 export const diaryTab = () => ({ diaryTab: true, assistantTab: false, optionsTab: false })
 export const assistantTab = () => ({ diaryTab: false, assistantTab: true, optionsTab: false })
 export const optionsTab = () => ({ diaryTab: false, assistantTab: false, optionsTab: true })

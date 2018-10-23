@@ -1,4 +1,4 @@
-/* globals localStorage */
+/* globals navigator, localStorage */
 const { assign } = Object
 const initialState = {
   messageSpeed: 1,
@@ -16,7 +16,9 @@ const state = stateJson ? assign(JSON.parse(stateJson), {
   messages: [],
   diaryTab: false,
   assistantTab: true,
-  optionsTab: false
+  optionsTab: false,
+  offline: !navigator.onLine,
+  saveIcon: false
 }) : initialState
 
 export default state

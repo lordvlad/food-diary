@@ -79,7 +79,8 @@ export default (state, actions) => hx`
       </div>
     </div>
     <div class=nav-right><div class=status>
-      <a><i class="fa fa-fw ${state.saveIcon ? 'fa-save' : ''}"></i></a>
+      <a>${state.saveIcon ? icon('save') : ''}</a>
+      <a>${state.offline ? icon('power-off') : ''}</a>
     </div></div>
   </div>
 </div>
