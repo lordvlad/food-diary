@@ -9,3 +9,4 @@ Big shout out to 📢
 - hyperx
 - chota
 - fontawesome
+- [Icon pack by Icons8](https://icons8.com)
