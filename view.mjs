@@ -1,4 +1,4 @@
-import { drinkSizes, foodSizes, hx, icon } from './util.mjs'
+import { drinkSizes, foodSizes, hx, icon, i } from './util.mjs'
 import fromNow from 'https://unpkg.com/fromnow@3.0.0/dist/fromnow.mjs'
 
 const active = 'active'
@@ -44,11 +44,11 @@ export default (state, actions) => hx`
     <h4>${state.entries.length} entries</h4>
     ${state.entries.map(e => hx`<p class=card>
       <p>
-        <b>${icon('clock')} ${fromNow(new Date(e.time).toString())} ago</b>
+        <b>${i.clockOutline} ${fromNow(new Date(e.time).toString())} ago</b>
       </p>
       ${!e.foodType ? '' : hx`
         <p>
-          ${icon('utensils')}
+          ${i.silveware}
           <b>${foodSizes[e.foodSize]}</b>
           ${e.foodType.join(', ')}
           <span class=text-grey>(${e.foodIngredients.join(', ')})</span>
@@ -56,16 +56,16 @@ export default (state, actions) => hx`
       `}
       ${!e.drink ? '' : hx`
         <p> 
-          ${icon('wine-glass')}
+          ${i.glassWine}
           ${drinkSizes[e.drinkSize]}
           ${e.drink.join(', ')} 
         </p>
       `}
       ${!e.stomach ? '' : hx`
-        <p> ${icon('frown')} ${e.severity} ${e.stomach} </p>
+        <p> ${i.fire} ${e.severity} ${e.stomach} </p>
       `}
       ${!e.head ? '' : hx`
-        <p> ${icon('frown')} ${e.severity} ${e.head} </p>
+        <p> ${i.brain} ${e.severity} ${e.head} </p>
       `}
     </p>`)}
   </div>
@@ -79,8 +79,8 @@ export default (state, actions) => hx`
       </div>
     </div>
     <div class=nav-right><div class=status>
-      <a>${state.saveIcon ? icon('save') : ''}</a>
-      <a>${state.offline ? icon('power-off') : ''}</a>
+      <a>${state.saveIcon ? i.contentSaveOutline : ''}</a>
+      <a>${state.offline ? i.powerPlugOff : ''}</a>
     </div></div>
   </div>
 </div>
