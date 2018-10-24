@@ -97,6 +97,8 @@ export const welcome = () => async ({ name }, { addMessage, recordEntry, ...acti
     await askForName()
     await askForMessageSpeed()
     await askForFirstMeal()
+    addMessage(hx`<p class=card>Wasn't that hard, was it? Simply record your meals and your headaches and stomach troubles, and we'll figure this out together.`)
+    recordEntry()
   } else {
     addMessage(assign(hx`<h1 class=card>Hello, ${name}!`, { immediate }))
     recordEntry()
