@@ -23,7 +23,7 @@ export const diaryTab = (e) => {e.preventDefault(); return ({ diaryTab: true, as
 export const assistantTab = (e) => {e.preventDefault(); return ({ diaryTab: false, assistantTab: true, optionsTab: false })}
 export const optionsTab = (e) => {e.preventDefault(); return ({ diaryTab: false, assistantTab: false, optionsTab: true })}
 
-export const setMessageSpeed = messageSpeed => (_, { save }) => { save(); return { messageSpeed: messageSpeedMultiplier * messageSpeed } }
+export const setMessageSpeed = messageSpeed => (_, { save }) => { save(); return { messageSpeed } }
 export const setName = name => (_, { save }) => { save(); return { name } }
 
 export const saveIcon = (on) => ({ saveIcon: on })
