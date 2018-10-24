@@ -1,0 +1,43 @@
+:root {
+    --grid-maxWidth: 54rem; /* max container width 540px */
+}
+.card {
+    animation-name: slide-down;
+    animation-duration:  0.4s; 
+    animation-timing-function: ease;
+}
+.card:first-of-type {
+    margin-top: 1rem;
+}
+.button+.button {
+    margin-bottom: 1rem;
+}
+body {
+    overflow-y: scroll;
+}
+button {
+    cursor: pointer;
+}
+.container {
+    padding-bottom: 6rem;
+    animation: fade-in 0.4s ease;
+}
+.app > .nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+}
+.tabs > a, .tabs > a.active, .tabs > a:hover, .tabs > a.active:hover {
+    border-bottom-width: 6px;
+}
+
+@keyframes fade-in {
+    0% { opacity: 0;}
+    100% { opacity: 1;}
+}
+
+@keyframes slide-down {
+    0% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
