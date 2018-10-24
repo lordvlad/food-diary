@@ -39,6 +39,9 @@ export default (state, actions) => hx`
         </p>
       </p>
     </p>
+    <p>
+      <a href="https://github.com/lordvlad/food-diary">about food-diary</a>
+    </p>
   </div>
   <div class="${state.diaryTab || hidden} container">
     <h4>${state.entries.length} entries</h4>
