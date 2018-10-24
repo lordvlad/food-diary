@@ -30,7 +30,10 @@ export const headAdjectives = ['nauseaus', 'aching']
 
 export const icons = new Proxy({}, {
   get: (_, schema) => new Proxy({}, {
-    get: (_, icon) => hx`<img src="https://icongr.am/${schema}/${icon.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.svg?size=16"/>`
+    get: (cache, icon) => {
+      if (!cache[icon]) cache[icon] = hx`<img src="https://icongr.am/${schema}/${icon.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.svg?size=16"/>`
+      return cache[icon]
+    }
   })
 })
 
