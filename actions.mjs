@@ -1,5 +1,5 @@
 /* globals localStorage */
-import { i, hx, randomId, defer, icon, stomachAdjectives,
+import { i, hx, randomId, defer, stomachAdjectives,
   stomachNouns, headAdjectives, headNouns, severities } from './util.mjs'
 
 const SECONDS = 1000
@@ -19,9 +19,9 @@ export const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeigh
 
 export const setOffline = (offline) => ({ offline })
 
-export const diaryTab = (e) => {e.preventDefault(); return ({ diaryTab: true, assistantTab: false, optionsTab: false })}
-export const assistantTab = (e) => {e.preventDefault(); return ({ diaryTab: false, assistantTab: true, optionsTab: false })}
-export const optionsTab = (e) => {e.preventDefault(); return ({ diaryTab: false, assistantTab: false, optionsTab: true })}
+export const diaryTab = (e) => { e.preventDefault(); return ({ diaryTab: true, assistantTab: false, optionsTab: false }) }
+export const assistantTab = (e) => { e.preventDefault(); return ({ diaryTab: false, assistantTab: true, optionsTab: false }) }
+export const optionsTab = (e) => { e.preventDefault(); return ({ diaryTab: false, assistantTab: false, optionsTab: true }) }
 
 export const setMessageSpeed = messageSpeed => (_, { save }) => { save(); return { messageSpeed } }
 export const setName = name => (_, { save }) => { save(); return { name } }

@@ -1,4 +1,4 @@
-import { drinkSizes, foodSizes, hx, icon, i } from './util.mjs'
+import { drinkSizes, foodSizes, hx, i } from './util.mjs'
 import fromNow from 'https://unpkg.com/fromnow@3.0.0/dist/fromnow.mjs'
 
 const active = 'active'
@@ -73,7 +73,6 @@ export default (state, actions) => hx`
     </p>`)}
   </div>
   <div class=nav>
-    <div class=nav-left></div>
     <div class=nav-center>
       <div class=tabs>
         <a href=# onclick=${actions.diaryTab} class=${state.diaryTab && active}>diary</a>
@@ -81,10 +80,6 @@ export default (state, actions) => hx`
         <a href=# onclick=${actions.optionsTab} class=${state.optionsTab && active}>options</a>
       </div>
     </div>
-    <div class=nav-right><div class=status>
-      <a>${state.saveIcon ? i.contentSaveOutline : ''}</a>
-      <a>${state.offline ? i.powerPlugOff : ''}</a>
-    </div></div>
   </div>
 </div>
 `
