@@ -27,3 +27,11 @@ export const stomachNouns = ['bloating', 'constipation', 'diarrhea', 'cramps', '
 export const stomachAdjectives = ['bloated', 'constipated', 'diarrhea', 'cramped', 'heartburn']
 export const headNouns = ['nausea', 'headaches']
 export const headAdjectives = ['nauseaus', 'aching']
+
+export const icons = new Proxy({}, {
+  get: (_, schema) => new Proxy({}, {
+    get: (_, icon) => `https://icongr.am/${schema}/${icon.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.svg?size=16`
+  })
+})
+
+export const i = icons.material
