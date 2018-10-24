@@ -135,7 +135,7 @@ export const addChoice = ({ question, choices, callback }) => (_, { addMessage }
 }
 
 export const askForFirstMeal = ({ callback }) => async (_, { recordMeal }) => {
-  const question = hx`<span>${i.clockOutline}} Now lets start tracking your meals. When was your last meal?</span>`
+  const question = hx`<span>${i.clockOutline} Now lets start tracking your meals. When was your last meal?</span>`
   recordMeal({ callback, question })
 }
 
