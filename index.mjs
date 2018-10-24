@@ -1,4 +1,4 @@
-import { app } from 'https://unpkg.com/hyperapp@1.2.9/dist/hyperapp.js?module'
+import { app } from 'https://unpkg.com/hyperapp@1.2.9/src/index.js?module'
 import * as actions from './actions.mjs'
 import view from './view.mjs'
 import state from './state.mjs'
