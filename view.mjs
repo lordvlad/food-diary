@@ -48,7 +48,7 @@ export default (state, actions) => hx`
       </p>
       ${!e.foodType ? '' : hx`
         <p>
-          ${i.silveware}
+          ${i.silverware}
           <b>${foodSizes[e.foodSize]}</b>
           ${e.foodType.join(', ')}
           <span class=text-grey>(${e.foodIngredients.join(', ')})</span>
