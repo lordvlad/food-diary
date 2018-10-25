@@ -1,6 +1,7 @@
-/* globals localStorage */
+/* globals confirm, localStorage */
 import { i, hx, randomId, defer, stomachAdjectives,
   stomachNouns, headAdjectives, headNouns, severities } from './util.mjs'
+import initialState from './state.mjs'
 
 const SECONDS = 1000
 const MINUTES = SECONDS * 60
@@ -8,9 +9,11 @@ const HOURS = MINUTES * 60
 
 const messageSpeedMultiplier = 1200
 
-const { assign } = Object
+const { entries, assign } = Object
 const immediate = true
 const $ = (id) => document.getElementById(id)
+
+const saveKeys = ['entries', 'messageSpeed', 'name']
 
 let messageTimeout = null
 let saveTimeout = null
@@ -29,7 +32,11 @@ export const setName = name => (_, { save }) => { save(); return { name } }
 export const saveIcon = (on) => ({ saveIcon: on })
 export const doSave = () => async (state) => {
   saveTimeout = null
-  localStorage.setItem('app', JSON.stringify(state))
+  const copy = entries(state).reduce((o, [k, v]) => {
+    if (saveKeys.includes(k)) o[k] = v
+    return o
+  }, {})
+  localStorage.setItem('app', JSON.stringify(copy))
   saveIcon(true)
   setTimeout(() => saveIcon(false), 2000)
 }
@@ -263,4 +270,23 @@ export const recordMeal = ({ question, callback } = {}) => async (_, { addChoice
   addMessage(hx`<p class=card> Okay, I've added ${entry.foodType.join(', ')} ${!entry.drink ? '' : ' and ' + entry.drink.join(', ')} to the records. </p>`)
   addEntry(entry)
   callback(entry)
+}
+
+export const resetUserData = () => async (state, actions) => {
+  if (confirm('Do you really want to reset all user data? You will not be able to undo this operation.')) {
+    localStorage.clear()
+    actions.loadStateFromLocalStorage()
+  }
+}
+
+export const loadStateFromLocalStorage = () => {
+  const str = localStorage.getItem('app')
+  return str ? JSON.parse(str) : initialState
+}
+
+export const run = () => async (_, actions) => {
+  actions.loadStateFromLocalStorage()
+  actions.welcome()
+
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
 }

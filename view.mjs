@@ -10,37 +10,42 @@ export default (state, actions) => hx`
     ${state.messages}
   </div>
   <div class="${state.optionsTab || hidden} container">
-    <p class=card>
+    <h4><span>\u00A0</span><span class=pull-right>options</span></h4>
+    <p>
+      <label for=name>Your Name</label>
+      <input type=text value=${state.name || ''}
+        placeholder="Jane Doe"
+        onblur=${e => actions.setName(e.target.value)}
+        onkeyup=${e => { if (e.keyCode !== 13) return; e.preventDefault(); actions.setName(e.target.value) }}>
+    </p>
+    <p>
+      <label for=messageSpeed>Message Speed</label>
       <p>
-        <label for=name>Your Name</label>
-        <input type=text value=${state.name || ''}
-          placeholder="Jane Doe"
-          onblur=${e => actions.setName(e.target.value)}
-          onkeyup=${e => { if (e.keyCode !== 13) return; e.preventDefault(); actions.setName(e.target.value) }}>
-      </p>
-      <p>
-        <label for=messageSpeed>Message Speed</label>
-        <p>
-          <button
-            onclick=${(e) => actions.setMessageSpeed(0.6)}
-            class="button primary ${state.messageSpeed === 0.6 || 'outline'}">
-            fast
-          </button>
-          <button
-            onclick=${(e) => actions.setMessageSpeed(1.0)}
-            class="button primary ${state.messageSpeed === 1.0 || 'outline'}">
-            medium
-          </button>
-          <button
-            onclick=${(e) => actions.setMessageSpeed(1.4)}
-            class="button primary ${state.messageSpeed === 1.4 || 'outline'}">
-            slow
-          </button>
-        </p>
+        <button
+          onclick=${() => actions.setMessageSpeed(0.6)}
+          class="button primary ${state.messageSpeed === 0.6 || 'outline'}">
+          fast
+        </button>
+        <button
+          onclick=${() => actions.setMessageSpeed(1.0)}
+          class="button primary ${state.messageSpeed === 1.0 || 'outline'}">
+          medium
+        </button>
+        <button
+          onclick=${() => actions.setMessageSpeed(1.4)}
+          class="button primary ${state.messageSpeed === 1.4 || 'outline'}">
+          slow
+        </button>
       </p>
     </p>
     <p>
-      <a href="https://github.com/lordvlad/food-diary">about food-diary</a>
+      <label for=reset>Reset all user data</label>
+      <p>
+        <button onclick=${() => actions.resetUserData()} class="button error">reset</button>
+      </p>
+    </p>
+    <p>
+      <a target=_new href="https://github.com/lordvlad/food-diary">about food-diary</a>
     </p>
   </div>
   <div class="${state.diaryTab || hidden} container">
@@ -50,7 +55,7 @@ export default (state, actions) => hx`
         <a href=# onclick=${actions.optionsTab} class=${state.optionsTab && active}>options</a>
       </span>
     </h4>
-    ${state.entries.lenght ? state.entries.map(e => hx`<p class=card>
+    ${state.entries.length ? state.entries.map(e => hx`<p class=card>
       <p>
         <b>${i.clockOutline} ${fromNow(new Date(e.time).toString())} ago</b>
       </p>

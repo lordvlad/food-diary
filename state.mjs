@@ -1,6 +1,4 @@
-/* globals navigator, localStorage */
-const { assign } = Object
-const initialState = {
+export default {
   messageSpeed: 1,
   entries: [],
   messages: [ ],
@@ -10,15 +8,3 @@ const initialState = {
   assistantTab: true,
   optionsTab: false
 }
-
-const stateJson = localStorage.getItem('app')
-const state = stateJson ? assign(JSON.parse(stateJson), {
-  messages: [],
-  diaryTab: false,
-  assistantTab: true,
-  optionsTab: false,
-  offline: !navigator.onLine,
-  saveIcon: false
-}) : initialState
-
-export default state
