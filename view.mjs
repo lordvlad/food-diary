@@ -44,9 +44,9 @@ export default (state, actions) => hx`
     </p>
   </div>
   <div class="${state.diaryTab || hidden} container">
-    <h4 class=row>
-      <span class=col>${state.entries.length} entries</span>
-      <span class="col is-text-right">
+    <h4>
+      <span>${state.entries.length} entries</span>
+      <span class=pull-right>
         <a href=# onclick=${actions.optionsTab} class=${state.optionsTab && active}>options</a>
       </span>
     </h4>
