@@ -50,7 +50,7 @@ export default (state, actions) => hx`
         <a href=# onclick=${actions.optionsTab} class=${state.optionsTab && active}>options</a>
       </span>
     </h4>
-    ${state.entries.map(e => hx`<p class=card>
+    ${state.entries.lenght ? state.entries.map(e => hx`<p class=card>
       <p>
         <b>${i.clockOutline} ${fromNow(new Date(e.time).toString())} ago</b>
       </p>
@@ -75,7 +75,14 @@ export default (state, actions) => hx`
       ${!e.head ? '' : hx`
         <p> ${i.brain} ${e.severity} ${e.head} </p>
       `}
-    </p>`)}
+    </p>`) : hx`
+      <div class=card>
+        <h4 class=is-text-center>No entries ${i.cardsOutline}</h4>
+        <p class=is-text-center>
+          switch over to the assistant to enter some records
+        </p>
+      </div>
+    `}
   </div>
   <div class=nav>
     <div class=nav-center>
