@@ -282,9 +282,13 @@ export const loadStateFromLocalStorage = () => {
   return str ? JSON.parse(str) : initialState
 }
 
+export const setServiceWorker = (sw) => ({ serviceWorker: sw })
+
 export const run = () => async (_, actions) => {
   actions.loadStateFromLocalStorage()
   actions.welcome()
 
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'))
+  window.addEventListener('load', () => navigator.serviceWorker
+    .register('/sw.js')
+    .then(sw => actions.setServiceWorker(sw)))
 }
