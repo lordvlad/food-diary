@@ -11,15 +11,15 @@ export default (state, actions) => hx`
   </div>
   <div class="${state.optionsTab || hidden} container">
     <h4><span>\u00A0</span><span class=pull-right>options</span></h4>
-    <p>
-      <label for=name>Your Name</label>
+    <p class=card>
+      <p>Your Name</p>
       <input type=text value=${state.name || ''}
         placeholder="Jane Doe"
         onblur=${e => actions.setName(e.target.value)}
         onkeyup=${e => { if (e.keyCode !== 13) return; e.preventDefault(); actions.setName(e.target.value) }}>
     </p>
-    <p>
-      <label for=messageSpeed>Message Speed</label>
+    <p class=card>
+      <p>Message Speed</p>
       <p>
         <button
           onclick=${() => actions.setMessageSpeed(0.6)}
@@ -38,8 +38,8 @@ export default (state, actions) => hx`
         </button>
       </p>
     </p>
-    <p>
-      <label for=reset>Reset all user data</label>
+    <p class=card>
+      <p>Reset all user data</p>
       <p>
         <button onclick=${() => actions.resetUserData()} class="button error">reset</button>
       </p>

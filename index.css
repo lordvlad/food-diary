@@ -32,6 +32,10 @@ button {
     border-bottom-width: 6px;
 }
 
+img[src*="icongr"] { 
+    margin-bottom: -2px;
+}
+
 @keyframes fade-in {
     0% { opacity: 0;}
     100% { opacity: 1;}
