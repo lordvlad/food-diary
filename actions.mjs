@@ -165,19 +165,17 @@ export const recordEntry = ({ callback } = {}) => async (_, actions) => {
   }
 }
 
-export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addEntry }) => {
+export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addChoice, addEntry }) => {
   const entry = {}
   {
     const question = hx`<span>${i.glassWine} What did you drink? (other than water)`
     const answer = await defer(callback => addQuestion({ question, callback }))
-    if (!['no', 'nein'].includes(answer)) entry.drink = answer.split(/\s*,\s*/)
+    entry.drink = answer.split(/\s*,\s*/)
   }
-  if (entry.drink && entry.drink.length) {
-    const question = hx`<span>${i.glassWine} How many cups or glasses did you have?</span>`
-    const choices = ['one', 'two', 'a bottle']
-    const choice = await defer(callback => addChoice({ choices, callback, question }))
-    entry.drinkSize = ['one', 'two', 'bottle'][choices.indexOf(choice)]
-  }
+  const question = hx`<span>${i.glassWine} How many cups or glasses did you have?</span>`
+  const choices = ['one', 'two', 'a bottle']
+  const choice = await defer(callback => addChoice({ choices, callback, question }))
+  entry.drinkSize = ['one', 'two', 'bottle'][choices.indexOf(choice)]
 
   addEntry(entry)
   callback(entry)
