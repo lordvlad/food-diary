@@ -62,15 +62,20 @@ export default (state, actions) => hx`
       ${!e.foodType ? '' : hx`
         <p>
           ${i.silverware}
-          <b>${foodSizes[e.foodSize]}</b>
           ${e.foodType.join(', ')}
           <span class=text-grey>(${e.foodIngredients.join(', ')})</span>
         </p> 
       `}
+      ${!e.snack ? '' : hx`
+        <p>
+          ${i.foodApple}
+          ${e.snack.join(', ')}
+        </p>
+      `}
       ${!e.drink ? '' : hx`
         <p> 
           ${i.glassWine}
-          ${drinkSizes[e.drinkSize]}
+          ${drinkSizes[e.drinkSize]} of
           ${e.drink.join(', ')} 
         </p>
       `}

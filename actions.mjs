@@ -149,9 +149,9 @@ export const askForFirstMeal = ({ callback }) => async (_, { recordMeal }) => {
 }
 
 export const recordEntry = ({ callback } = {}) => async (_, actions) => {
-  const { addChoice, recordMeal, recordDrink, recordStomachAche, recordHeadache } = actions
+  const { addChoice, recordSnack, recordMeal, recordDrink, recordStomachAche, recordHeadache } = actions
   const question = hx`What do you want to record?`
-  const choices = ['A meal', 'a drink', 'stomach ache', 'headache']
+  const choices = ['A meal', 'a snack', 'a drink', 'stomach ache', 'headache']
   const choice = await defer(callback => addChoice({ question, choices, callback }))
   const cb = (...args) => {
     if (callback) callback(...args) // eslint-disable-line 
@@ -159,14 +159,19 @@ export const recordEntry = ({ callback } = {}) => async (_, actions) => {
   }
   switch (choices.indexOf(choice)) {
     case 0: recordMeal({ callback: cb }); break
-    case 1: recordDrink({ callback: cb }); break
-    case 2: recordStomachAche({ callback: cb }); break
-    case 3: recordHeadache({ callback: cb }); break
+    case 1: recordSnack({ callback: cb }); break
+    case 2: recordDrink({ callback: cb }); break
+    case 3: recordStomachAche({ callback: cb }); break
+    case 4: recordHeadache({ callback: cb }); break
   }
 }
 
-export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addChoice, addEntry }) => {
+export const recordDrink = ({ callback } = {}) => async (_, { recordTime, addMessage, addQuestion, addChoice, addEntry }) => {
   const entry = {}
+  {
+    const question = hx`<span>${i.clockOutline} When did you have it?</span>`
+    entry.time = await defer(callback => recordTime({ callback, question }))
+  }
   {
     const question = hx`<span>${i.glassWine} What did you drink? (other than water)`
     const answer = await defer(callback => addQuestion({ question, callback }))
@@ -176,6 +181,7 @@ export const recordDrink = ({ callback } = {}) => async (_, { addQuestion, addCh
   const choices = ['one', 'two', 'a bottle']
   const choice = await defer(callback => addChoice({ choices, callback, question }))
   entry.drinkSize = ['one', 'two', 'bottle'][choices.indexOf(choice)]
+  addMessage(hx`<p class=card> Okay, I've added ${entry.drink.join(', ')} to the records. </p>`)
 
   addEntry(entry)
   callback(entry)
@@ -213,36 +219,45 @@ export const recordHeadache = ({callback} = {}) => async(_, {addChoice, addEntry
   callback(entry)
 }
 
-export const recordMeal = ({ question, callback } = {}) => async (_, { addChoice, addQuestion, addEntry }) => {
+export const recordSnack = ({ callback } = {}) => async (_, { addMessage, addQuestion, addEntry, recordTime }) => {
+  const question = hx`<span>${i.clockOutline} When did you have it?</span>`
+  const time = await defer(callback => recordTime({ callback, question }))
+  const question2 = hx`<span>${i.foodApple} What snack did you have?</span>`
+  const answer = await defer(callback => addQuestion({ question: question2, callback }))
+  const snack = answer.split(/\s*,\s*/)
+  const entry = {snack, time}
+  addMessage(hx`<p class=card> Okay, I've added ${entry.snack.join(', ')} to the records. </p>`)
+  addEntry(entry)
+  callback(entry)
+}
+
+export const recordTime = ({question, callback} = {}) => async(_, {addChoice}) => {
+  const choices = ['just now', 'an hour ago', 'three hours ago', 'six hours ago', 'yesterday']
+  const choice = await defer(callback => addChoice({ question, choices, callback }))
+  let time = 0
+  switch (choices.indexOf(choice)) {
+    case 0: time = Date.now(); break
+    case 1: time = Date.now() - (1 * HOURS); break
+    case 2: time = Date.now() - (3 * HOURS); break
+    case 3: time = Date.now() - (6 * HOURS); break
+    case 4:
+      time = new Date()
+      const choices = ['afternoon', 'evening', 'late night']
+      const question = hx`<span>${i.clockOutline} At what time did you eat last yesterday?`
+      const choice = await defer(callback => addChoice({ question, choices, callback }))
+      switch (choices.indexOf(choice)) {
+        case 0: time.setHours(17); break
+        case 1: time.setHours(19); break
+        case 2: time.setHours(22); break
+      }
+  }
+  callback(time)
+}
+
+export const recordMeal = ({ question, callback } = {}) => async (_, { recordTime, addChoice, addQuestion, addEntry, addMessage }) => {
   const entry = {}
-  {
-    if (!question) question = hx`<span>${i.clockOutline} When was your last meal?</span>`
-    const choices = ['just now', 'an hour ago', 'three hours ago', 'six hours ago', 'yesterday']
-    const choice = await defer(callback => addChoice({ question, choices, callback }))
-    switch (choices.indexOf(choice)) {
-      case 0: entry.time = Date.now(); break
-      case 1: entry.time = Date.now() - (1 * HOURS); break
-      case 2: entry.time = Date.now() - (3 * HOURS); break
-      case 3: entry.time = Date.now() - (6 * HOURS); break
-      case 4:
-        const time = new Date()
-        const choices = ['afternoon', 'evening', 'late night']
-        const question = hx`<span>${i.clockOutline} At what time did you eat last yesterday?`
-        const choice = await defer(callback => addChoice({ question, choices, callback }))
-        switch (choices.indexOf(choice)) {
-          case 0: time.setHours(17); break
-          case 1: time.setHours(19); break
-          case 2: time.setHours(22); break
-        }
-        entry.time = time.getTime()
-    }
-  }
-  {
-    const question = hx`<span>${i.silverware} What did you have?</span>`
-    const choices = ['a snack', 'a meal', 'a heavy meal']
-    const choice = await defer(callback => addChoice({ choices, callback, question }))
-    entry.foodSize = ['S', 'M', 'L'][choices.indexOf(choice)]
-  }
+  if (!question) question = hx`<span>${i.clockOutline} When was your last meal?</span>`
+  entry.time = await defer(callback => recordTime({ callback, question }))
   {
     const question = hx`<span>${i.silverware} Tell me the general type of the dish. Was it a stew or a pie or some curry, for example.</span>`
     const answer = await defer(callback => addQuestion({ question, callback }))
@@ -256,7 +271,7 @@ export const recordMeal = ({ question, callback } = {}) => async (_, { addChoice
   {
     const question = hx`<span>${i.glassWine} Did you have a drink as well? (other than water)`
     const answer = await defer(callback => addQuestion({ question, callback }))
-    if (!['no', 'nein'].includes(answer)) entry.drink = answer.split(/\s*,\s*/)
+    if (!['no', 'nein', 'No', 'Nein'].includes(answer)) entry.drink = answer.split(/\s*,\s*/)
   }
   if (entry.drink && entry.drink.length) {
     const question = hx`<span>${i.glassWine} How many cups or glasses did you have?</span>`
