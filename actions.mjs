@@ -70,7 +70,7 @@ export const addMessage = message => ({ messageQueue, messageSpeed }, { dequeueM
 export const askForName = ({ callback }) => async (_, { setName, addMessage, addQuestion }) => {
   const question = 'But first, I\'ll need your name. What should I call you?'
   const name = await defer(callback => addQuestion({ question, callback }))
-  addMessage(assign(hx`<p class="card left">Hello, ${name}!</p>`, { immediate }))
+  addMessage(assign(hx`<p class=card>Hello, ${name}!</p>`, { immediate }))
   setName(name)
   callback(name)
 }
@@ -93,7 +93,7 @@ export const askForMessageSpeed = ({ callback }) => async (_, { addChoice, addMe
 export const welcome = () => async ({ name }, { addMessage, recordEntry, ...actions }) => {
   const { askForName, askForMessageSpeed, askForFirstMeal } = new Proxy({}, { get: (o, k) => () => defer(callback => actions[k]({ callback })) })
   const hello = () => {
-    addMessage(assign(hx`<h1 class=card>Hello!`, { immediate }))
+    addMessage(assign(hx`<h1 class="card is-text-right">Hello!`, { immediate }))
     addMessage(hx`<p class=card>Welcome to your personal food diary. ${i.handPeace}`)
     addMessage(hx`<p class=card>I will help you track everything you eat and drink. And I will track
               how that makes you feel.</p>`)
@@ -107,7 +107,7 @@ export const welcome = () => async ({ name }, { addMessage, recordEntry, ...acti
     addMessage(hx`<p class=card>Wasn't that hard, was it? Simply record your meals and your headaches and stomach troubles, and we'll figure this out together.`)
     recordEntry()
   } else {
-    addMessage(assign(hx`<h1 class=card>Hello, ${name}!`, { immediate }))
+    addMessage(assign(hx`<h1 class="card is-text-right">Hello, ${name}!`, { immediate }))
     recordEntry()
   }
 }
