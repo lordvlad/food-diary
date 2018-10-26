@@ -3,6 +3,7 @@ import fromNow from 'https://unpkg.com/fromnow@3.0.0/dist/fromnow.mjs'
 
 const active = 'active'
 const hidden = 'is-hidden'
+const { clockOutline, silverware, fire, brain, foodApple, glassWine, cardsOutline } = i
 
 export default (state, actions) => hx`
 <div class=app>
@@ -57,37 +58,37 @@ export default (state, actions) => hx`
     </h4>
     ${state.entries.length ? state.entries.map(e => hx`<p class=card>
       <p>
-        <b>${i.clockOutline} ${fromNow(new Date(e.time).toString())} ago</b>
+        <b>${clockOutline} ${fromNow(new Date(e.time).toString())} ago</b>
       </p>
       ${!e.foodType ? '' : hx`
         <p>
-          ${i.silverware}
+          ${silverware}
           ${e.foodType.join(', ')}
           <span class=text-grey>(${e.foodIngredients.join(', ')})</span>
         </p> 
       `}
       ${!e.snack ? '' : hx`
         <p>
-          ${i.foodApple}
+          ${foodApple}
           ${e.snack.join(', ')}
         </p>
       `}
       ${!e.drink ? '' : hx`
         <p> 
-          ${i.glassWine}
+          ${glassWine}
           ${drinkSizes[e.drinkSize]} of
           ${e.drink.join(', ')} 
         </p>
       `}
       ${!e.stomach ? '' : hx`
-        <p> ${i.fire} ${e.severity} ${e.stomach} </p>
+        <p> ${fire} ${e.severity} ${e.stomach} </p>
       `}
       ${!e.head ? '' : hx`
-        <p> ${i.brain} ${e.severity} ${e.head} </p>
+        <p> ${brain} ${e.severity} ${e.head} </p>
       `}
     </p>`) : hx`
       <div class=card>
-        <h4 class=is-text-center>No entries ${i.cardsOutline}</h4>
+        <h4 class=is-text-center>No entries ${cardsOutline}</h4>
         <p class=is-text-center>
           switch over to the assistant to enter some records
         </p>
