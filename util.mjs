@@ -1,4 +1,4 @@
-/* globals fetch */
+/* globals Image */
 import { app, h } from 'https://unpkg.com/hyperapp@1.2.9/src/index.js?module'
 import hyperx from './hyperx.mjs'
 
@@ -32,8 +32,8 @@ export const icons = new Proxy({}, {
   get: (_, schema) => new Proxy({}, {
     get: (cache, icon) => {
       if (!cache[icon]) {
-        const src=`https://icongr.am/${schema}/${icon.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.svg?size=16`
-        fetch(src) // preload image in background
+        const src = `https://icongr.am/${schema}/${icon.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}.svg?size=16`
+        new Image().src = src // preload image in background
         cache[icon] = hx`<img src="${src}"/>`
       }
       return cache[icon]

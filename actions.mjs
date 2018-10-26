@@ -94,7 +94,7 @@ export const askForMessageSpeed = ({ callback }) => async (_, { addChoice, addMe
 export const welcome = () => async ({ name }, { addMessage, recordEntry, ...actions }) => {
   const { askForName, askForMessageSpeed, askForFirstMeal } = new Proxy({}, { get: (o, k) => () => defer(callback => actions[k]({ callback })) })
   const hello = () => {
-    addMessage(assign(hx`<h1 class="card is-text-right">Hello!`, { immediate }))
+    addMessage(assign(hx`<h1 class="card is-text-center">Hello!`, { immediate }))
     addMessage(hx`<p class=card>Welcome to your personal food diary. ${handPeace}`)
     addMessage(hx`<p class=card>I will help you track everything you eat and drink. And I will track
               how that makes you feel.</p>`)
@@ -108,7 +108,7 @@ export const welcome = () => async ({ name }, { addMessage, recordEntry, ...acti
     addMessage(hx`<p class=card>Wasn't that hard, was it? Simply record your meals and your headaches and stomach troubles, and we'll figure this out together.`)
     recordEntry()
   } else {
-    addMessage(assign(hx`<h1 class="card is-text-right">Hello, ${name}!`, { immediate }))
+    addMessage(assign(hx`<h1 class="card is-text-center">Hello, ${name}!`, { immediate }))
     recordEntry()
   }
 }
@@ -299,8 +299,9 @@ export const loadStateFromLocalStorage = () => {
 }
 
 export const setServiceWorker = (sw) => ({ serviceWorker: sw })
+export const setDontWantInstallation = () => ({ dontWantInstallation: true })
 
-export const run = () => async (_, actions) => {
+export const run = () => async (state, actions) => {
   actions.loadStateFromLocalStorage()
   actions.welcome()
 
