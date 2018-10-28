@@ -40,16 +40,33 @@ export default (state, actions) => hx`
       </p>
     </p>
     <p class=card>
+      <p>Notifications</p>
+      <p>
+        <button 
+          onclick=${() => actions.setUpNotifications()}
+          class="button primary ${state.notificationSubscription || 'outline'}">
+        enabled
+        </button>
+        <button 
+          onclick=${() => actions.disableNotifications()}
+          class="button primary ${state.notificationSubscription && 'outline'}">
+        disabled
+        </button>
+      </p>
+    </p>
+    <p class=card>
       <p>Reset all user data</p>
       <p>
         <button onclick=${() => actions.resetUserData()} class="button error">reset</button>
       </p>
     </p>
-    <p>
-      <a target=_new href="https://github.com/lordvlad/food-diary">about food-diary</a>
-    </p>
-    <p>
-      Favicons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+    <p class=card>
+      <p>
+        Find out more about Food Diary on <a target=_new href="https://github.com/lordvlad/food-diary">github</a>.
+      </p>
+      <p>
+        Favicons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>.
+      </p>
     </p>
   </div>
   <div class="${state.diaryTab || hidden} container">

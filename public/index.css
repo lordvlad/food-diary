@@ -9,7 +9,7 @@
 .card:first-of-type {
     margin-top: 1rem;
 }
-.button+.button {
+.button {
     margin-bottom: 1rem;
 }
 body {

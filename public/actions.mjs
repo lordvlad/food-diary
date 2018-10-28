@@ -1,6 +1,7 @@
-/* globals confirm, localStorage */
+/* globals Notification, confirm, localStorage */
 import { i, hx, randomId, defer, stomachAdjectives,
-  stomachNouns, headAdjectives, headNouns, severities } from './util.mjs'
+  stomachNouns, headAdjectives, headNouns, severities,
+  urlBase64ToUint8Array } from './util.mjs'
 import initialState from './state.mjs'
 
 const SECONDS = 1000
@@ -9,28 +10,34 @@ const HOURS = MINUTES * 60
 
 const messageSpeedMultiplier = 1200
 
+const contact = 'contact the developer via https://github.com/lordvlad/food-diary/issues'
+
 const { entries, assign } = Object
 const immediate = true
 const $ = (id) => document.getElementById(id)
-const { clockOutline, silverware, fire, brain, foodApple, glassWine, cardsOutline, handPeace, gauge } = i
+const { clockOutline, silverware, fire, brain, foodApple, glassWine, 
+  handPeace, gauge, cellphoneMessage, pencil } = i
 
-const saveKeys = ['entries', 'messageSpeed', 'name']
+const saveKeys = [
+  'entries', 
+  'messageSpeed', 
+  'name', 
+  'notificationSubscription'
+]
 
 let messageTimeout = null
 let saveTimeout = null
 
 export const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight)
 
-export const setOffline = (offline) => ({ offline })
-
-export const diaryTab = (e) => { e.preventDefault(); return ({ diaryTab: true, assistantTab: false, optionsTab: false }) }
-export const assistantTab = (e) => { e.preventDefault(); return ({ diaryTab: false, assistantTab: true, optionsTab: false }) }
-export const optionsTab = (e) => { e.preventDefault(); return ({ diaryTab: false, assistantTab: false, optionsTab: true }) }
+export const diaryTab = (e) => { e && e.preventDefault(); return ({ diaryTab: true, assistantTab: false, optionsTab: false }) }
+export const assistantTab = (e) => { e && e.preventDefault(); return ({ diaryTab: false, assistantTab: true, optionsTab: false }) }
+export const optionsTab = (e) => { e && e.preventDefault(); return ({ diaryTab: false, assistantTab: false, optionsTab: true }) }
 
 export const setMessageSpeed = messageSpeed => (_, { save }) => { save(); return { messageSpeed } }
 export const setName = name => (_, { save }) => { save(); return { name } }
+export const setNotificationSubscription = notificationSubscription => (_, { save }) => { save(); return { notificationSubscription } }
 
-export const saveIcon = (on) => ({ saveIcon: on })
 export const doSave = () => async (state) => {
   saveTimeout = null
   const copy = entries(state).reduce((o, [k, v]) => {
@@ -38,20 +45,20 @@ export const doSave = () => async (state) => {
     return o
   }, {})
   localStorage.setItem('app', JSON.stringify(copy))
-  saveIcon(true)
-  setTimeout(() => saveIcon(false), 2000)
+  console.log('saved state')
 }
 export const save = () => async (_, { doSave }) => {
   if (saveTimeout) clearTimeout(saveTimeout)
   saveTimeout = setTimeout(doSave, 2000)
 }
 
-export const dequeueMessage = () => ({ messages, messageQueue, messageSpeed }, { dequeueMessage, scrollToBottom }) => {
+export const dequeueMessage = () => ({ messages, messageQueue, messageSpeed }, { dequeueMessage, scrollToBottom, assistantTab }) => {
   const message = messageQueue.shift()
   messageTimeout = null
   if (messageQueue.length) messageTimeout = setTimeout(dequeueMessage, messageSpeed * messageSpeedMultiplier)
   if (message.onCreated) setTimeout(message.onCreated, 10)
   setTimeout(scrollToBottom, 10)
+  assistantTab()
   return { messageQueue, messages: [...messages, message] }
 }
 
@@ -92,25 +99,25 @@ export const askForMessageSpeed = ({ callback }) => async (_, { addChoice, addMe
 }
 
 export const welcome = () => async ({ name }, { addMessage, recordEntry, ...actions }) => {
-  const { askForName, askForMessageSpeed, askForFirstMeal } = new Proxy({}, { get: (o, k) => () => defer(callback => actions[k]({ callback })) })
-  const hello = () => {
+  const { checkNotifications, setUpNotifications, askForName, askForMessageSpeed, askForFirstMeal } = new Proxy({}, { get: (o, k) => () => defer(callback => actions[k]({ callback })) })
+  if (!name) {
     addMessage(assign(hx`<h1 class="card is-text-center">Hello!`, { immediate }))
     addMessage(hx`<p class=card>Welcome to your personal food diary. ${handPeace}`)
     addMessage(hx`<p class=card>I will help you track everything you eat and drink. And I will track
               how that makes you feel.</p>`)
     addMessage(hx`<p class=card>Together, we will figure out your food intolerances.</p>`)
-  }
-  if (!name) {
-    hello()
+
     await askForName()
     await askForMessageSpeed()
     await askForFirstMeal()
     addMessage(hx`<p class=card>Wasn't that hard, was it? Simply record your meals and your headaches and stomach troubles, and we'll figure this out together.`)
-    recordEntry()
+    await setUpNotifications()
   } else {
     addMessage(assign(hx`<h1 class="card is-text-center">Hello, ${name}!`, { immediate }))
-    recordEntry()
+    const notifications = await checkNotifications()
+    if (notifications === 'obsolete') await setUpNotifications()
   }
+  recordEntry()
 }
 
 export const addQuestion = ({ question, callback }) => (_, { addMessage }) => {
@@ -151,7 +158,7 @@ export const askForFirstMeal = ({ callback }) => async (_, { recordMeal }) => {
 
 export const recordEntry = ({ callback } = {}) => async (_, actions) => {
   const { addChoice, recordSnack, recordMeal, recordDrink, recordStomachAche, recordHeadache } = actions
-  const question = hx`What do you want to record?`
+  const question = hx`<span>${pencil} What do you want to record?</span>`
   const choices = ['A meal', 'a snack', 'a drink', 'stomach ache', 'headache']
   const choice = await defer(callback => addChoice({ question, choices, callback }))
   const cb = (...args) => {
@@ -286,11 +293,19 @@ export const recordMeal = ({ question, callback } = {}) => async (_, { recordTim
   callback(entry)
 }
 
-export const resetUserData = () => async (state, actions) => {
-  if (confirm('Do you really want to reset all user data? You will not be able to undo this operation.')) {
-    localStorage.clear()
-    actions.loadStateFromLocalStorage()
+export const resetUserData = ({ callback } = {}) => async (_, { addChoice, disableNotifications }) => {
+  const question = 'Do you really want to reset all user data? You will not be able to undo this operation.'
+  const choices = ['No, keep my data', 'Yes, reset all user data']
+  const choice = await defer(callback => addChoice({choices, question, callback}))
+  if (choice === choices[0]) {
+    addMessage(hx`<p class=card>Phew, crisis averted!</p>`)
+    return callback && callback()
   }
+
+  await defer(callback => disableNotifications({ callback }))
+  localStorage.clear()
+  actions.loadStateFromLocalStorage() 
+  location.reload()
 }
 
 export const loadStateFromLocalStorage = () => {
@@ -298,14 +313,79 @@ export const loadStateFromLocalStorage = () => {
   return str ? JSON.parse(str) : initialState
 }
 
-export const setServiceWorker = (sw) => ({ serviceWorker: sw })
-export const setDontWantInstallation = () => ({ dontWantInstallation: true })
+export const disableNotifications = ({ callback } = {}) => async ({ notificationSubscription }, { setNotificationSubscription, recordEntry, addMessage }) => {
+  if (!callback) callback = recordEntry
+  if (!notificationSubscription) { 
+    addMessage(hx`<p class=card>${cellphoneMessage} Notifications are not set up, nothing to disable.</p>`)
+    return callback(true)
+  }
+  const body = JSON.stringify(notificationSubscription)
+  const response = await fetch('/unsubscribe', { method: 'POST', body }) 
+  if (response.ok) {
+    addMessage(hx`<p class=card>${cellphoneMessage} Successfully disabled notifications.</p>`)
+    setNotificationSubscription(null)
+    return callback(true)
+  } 
+  addMessage(hx`<p class=card>${cellphoneMessage} Notifications failed to be disabled. Please try again in a little while or ${contact}.</p>`) 
+  callback(false)
+}
 
-export const run = () => async (state, actions) => {
-  actions.loadStateFromLocalStorage()
-  actions.welcome()
+export const checkNotifications = ({ callback } = {}) => async ({ notificationSubscription }, { recordEntry }) => {
+  if (!callback) callback = recordEntry
+  if (!notificationSubscription) return callback('none')
+  const body = JSON.stringify(notificationSubscription)
+  const response = await fetch('/checkSubscription', { method: 'POST', body }) 
+  callback(response.ok ? 'ok' : 'obsolete')
+}
 
-  window.addEventListener('load', () => navigator.serviceWorker
-    .register('/sw.js')
-    .then(sw => actions.setServiceWorker(sw)))
+export const setUpNotifications = ({ callback } = {}) => async (_, { setNotificationSubscription, addMessage, addChoice, recordEntry }) => {
+  if (!callback) callback = recordEntry
+  if (Notification.permission !== 'granted') {
+    const bail = () => {
+      addMessage(hx`That's okay if you don't want notifications, but keep in mind that you'll 
+        need to track your meals regularly to find patterns. You can set up notifications via
+        diary > options if you change your mind.`)
+      setNotificationSubscription(null)
+      return callback() 
+    }
+    const question = hx`<span>${cellphoneMessage} Food diary can remind you to track your meals. You can always change
+      your preference in the settings, should you change your mind. Do you want to set up notifications now?</span>`
+    const choices = ['yes, please', 'no, I don\'t want notifications']
+    const choice = await defer(callback => addChoice({ choices, callback, question }))
+    if (choice === choices[1]) return bail()
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') return bail()
+  }
+  const registration = await navigator.serviceWorker.ready
+  const publicKey = await (await fetch('/publicKey')).text()
+  const appServerKey = urlBase64ToUint8Array(publicKey)
+  const subscription = await registration.pushManager.subscribe({ appServerKey, userVisibleOnly: true })
+  const body = JSON.stringify(subscription)
+  const response = await fetch('/subscribe', { method: 'POST', body })
+  if (response.ok) {
+    setNotificationSubscription(subscription)
+    addMessage(hx`<p class=card>${cellphoneMessage} Notifications sucessfully set up.`)
+  } else {
+    setNotificationSubscription(null)
+    addMessage(hx`<p class=card>${cellphoneMessage} Notifications were not set up successfully. Try again in a little while or ${contact}.`)
+    console.error(`${response.status} ${response.statusText}`)
+  }
+  callback()
+}
+
+export const onLoad = () => async () => {
+  navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })
+}
+
+export const run = () => async (_, actions) => {
+  const { onLoad, welcome, loadStateFromLocalStorage } = actions
+  window.actions = actions // FIXME debug code
+  window.addEventListener('load', () => onLoad())
+  loadStateFromLocalStorage()
+  welcome()
+}
+
+// FIXME debug code
+export const exposeState = () => async (state, _) => {
+  console.log(window.state = state)
 }
