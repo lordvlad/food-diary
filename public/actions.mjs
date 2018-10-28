@@ -4,6 +4,8 @@ import { i, hx, randomId, defer, stomachAdjectives,
   urlBase64ToUint8Array } from './util.mjs'
 import initialState from './state.mjs'
 
+import { set } from 'https://unpkg.com/idb-keyval@3.1.0/dist/idb-keyval.mjs'
+
 const SECONDS = 1000
 const MINUTES = SECONDS * 60
 const HOURS = MINUTES * 60
@@ -44,7 +46,9 @@ export const doSave = () => async (state) => {
     if (saveKeys.includes(k)) o[k] = v
     return o
   }, {})
-  localStorage.setItem('app', JSON.stringify(copy))
+  const str = JSON.stringify(copy)
+  localStorage.setItem('app', str)
+  set('app', JSON.parse(str))
   console.log('saved state')
 }
 export const save = () => async (_, { doSave }) => {
