@@ -22,7 +22,7 @@ self.addEventListener('notificationclick', function (event) {
   )
 })
 
-const getMessage = () => {
+const getMessage = async () => {
   const now = new Date()
   const { entries } = await idbKeyval.get('app')
   const lastEntry = entries.length ? entries[0] : null
@@ -55,7 +55,7 @@ const getMessage = () => {
 self.addEventListener('push', (e) => {
   e.waitUntil((async () => {
     console.log('woke up because of a push notification')
-    const { title, body } = getMessage()
+    const { title, body } = await getMessage()
     if (!title) return
     const options = { body, tag: 'entry', kicon: 'icon-128.png', 
       data: { dateOfArrival: Date.now(), primaryKey: '2' } }
