@@ -57,7 +57,7 @@ self.addEventListener('push', (e) => {
     console.log('woke up because of a push notification')
     const { title, body } = await getMessage()
     if (!title) return
-    const options = { body, tag: 'entry', kicon: 'icon-128.png', 
+    const options = { body, tag: 'entry', icon: 'icon-128.png', 
       data: { dateOfArrival: Date.now(), primaryKey: '2' } }
     await self.registration.showNotification(title, options)
   })())
