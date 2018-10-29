@@ -9,7 +9,7 @@
     "dev": "micro-dev",
     "stage": "now --public",
     "prod": "now alias",
-    "configure": "node configure.js && now login"
+    "configure": "node configure.js"
   },
   "repository": {
     "type": "git",
