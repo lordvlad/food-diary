@@ -9,7 +9,7 @@
     "dev": "micro-dev",
     "stage": "now --public",
     "prod": "now alias",
-    "generate-keys": "node generate-web-push-keys.js"
+    "configure": "node configure.js && now login"
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,8 @@
   },
   "devDependencies": {
     "atob": "^2.1.2",
-    "micro-dev": "^3.0.0"
+    "micro-dev": "^3.0.0",
+    "now": "^11.4.6",
+    "outdent": "^0.7.0"
   }
 }
