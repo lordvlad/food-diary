@@ -55,6 +55,7 @@ const getMessage = async () => {
 self.addEventListener('push', (e) => {
   e.waitUntil((async () => {
     console.log('woke up because of a push notification')
+    await fetch('/')
     const { title, body } = await getMessage()
     if (!title) return
     const options = { body, tag: 'entry', icon: 'icon-128.png', 
