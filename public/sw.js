@@ -1,32 +1,42 @@
-/* globals idbKeyval, clients, self, workbox, importScripts */
+/* globals idbKeyval, workbox, importScripts, fetch, clients, self */
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.1/workbox-sw.js')
 importScripts('https://unpkg.com/idb-keyval@3.1.0/dist/idb-keyval-iife.js')
 
 const { routing, strategies } = workbox
+const { get } = idbKeyval
 
 routing.registerRoute(/.*\.(json|mjs|js|css|html).*/, strategies.staleWhileRevalidate())
 routing.registerRoute(/.*\.svg.*/, strategies.cacheFirst())
 routing.registerRoute('/', strategies.staleWhileRevalidate())
 
-self.addEventListener('notificationclick', function (event) {
-  event.notification.close()
+self.addEventListener('notificationclick', e => { e.notification.close(); e.waitUntil(onClick()) })
+self.addEventListener('push', e => e.waitUntil(onPush()))
 
-  event.waitUntil(
-    clients.matchAll({ type: 'window' })
-    .then(clientList => {
-      for (let client of clientList) {
-        if (client.url === '/' && 'focus' in client) return client.focus()
-      }
-      if (clients.openWindow) return clients.openWindow('https://food-diary.now.sh')
-    })
-  )
-})
+const onClick = async () => {
+  const clientList = await clients.matchAll({ type: 'window' })
+  for (let client of clientList) { if (client.url === '/' && 'focus' in client) return client.focus() }
+  if (clients.openWindow) return clients.openWindow('https://food-diary.now.sh')
+}
+
+const onPush = async () => {
+  console.log('woke up because of a push notification')
+  const dateOfArrival = Date.now()
+  const response = await fetch(`/echo?cacheBuster=${dateOfArrival}`)
+  if (response.ok) console.log('server alive')
+  else console.error(response)
+  const tag = 'entry'
+  const icon = 'icon-128.png'
+  const data = { dateOfArrival, primaryKey: '2' }
+  const { title, body } = await getMessage()
+  if (!title) return
+  await self.registration.showNotification(title, { body, tag, icon, data })
+}
 
 const getMessage = async () => {
   const now = new Date()
-  const { entries } = await idbKeyval.get('app')
+  const entries = await get('entries') || []
   const lastEntry = entries.length ? entries[0] : null
-  if (lastEntry && ((now.getTime() - lastEntry.time) < ( 2 * 60 * 60 * 1000))) return {}
+  if (lastEntry && ((now.getTime() - lastEntry.time) < (2 * 60 * 60 * 1000))) return {}
 
   switch (now.getHours()) {
     case 8:
@@ -51,15 +61,3 @@ const getMessage = async () => {
       return {}
   }
 }
-
-self.addEventListener('push', (e) => {
-  e.waitUntil((async () => {
-    console.log('woke up because of a push notification')
-    await fetch('/')
-    const { title, body } = await getMessage()
-    if (!title) return
-    const options = { body, tag: 'entry', icon: 'icon-128.png', 
-      data: { dateOfArrival: Date.now(), primaryKey: '2' } }
-    await self.registration.showNotification(title, options)
-  })())
-})
