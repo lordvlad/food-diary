@@ -1,47 +1,45 @@
 :root {
-    --grid-maxWidth: 54rem; /* max container width 540px */
-}
-.card {
-    animation-name: slide-down;
-    animation-duration:  0.4s; 
-    animation-timing-function: ease;
-}
-.card:first-of-type {
-    margin-top: 1rem;
-}
-.button {
-    margin-bottom: 1rem;
-}
-body {
-    overflow-y: scroll;
-}
-button {
-    cursor: pointer;
-}
-.container {
-    padding-bottom: 6rem;
-    animation: fade-in 0.4s ease;
-}
-.app > .nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 50%,rgba(255,255,255,1) 100%);
-}
-.tabs > a, .tabs > a.active, .tabs > a:hover, .tabs > a.active:hover {
-    border-bottom-width: 6px;
+  --grid-maxWidth: 54rem; /* max container width 540px */
+  --color-primary: #FF770D;
+  --color-lightGrey: #d2d6dd;
+  --color-grey: #7e818b;
+  --color-darkGrey: #3f4144;
+  --color-error: #d43939;
+  --color-success: #28bd14;
+  --grid-gutter: 2rem;
+  --font-size: 1.6rem;
+  --font-family: "Helvetica Neue", sans-serif;
 }
 
-img[src*="icongr"] { 
-    margin-bottom: -2px;
+@keyframes fade-in { 0% { opacity: 0;} 100% { opacity: 1;} }
+@keyframes slide-down { 0% { transform: translateY(-20px); } 100% { transform: translateY(0); } }
+
+body { overflow-y: scroll; }
+button { cursor: pointer; }
+img[src*="icongr"] { margin-bottom: -2px; }
+
+.card { animation: slide-down 0.4s ease, fade-in 0.4s ease; }
+.card:first-of-type { margin-top: 1rem; }
+.container { padding-bottom: 6rem; animation: fade-in 0.4s ease; }
+.button { margin-bottom: 1rem; }
+.tabs > a, .tabs > a.active, .tabs > a:hover, .tabs > a.active:hover { border-bottom-width: 6px; }
+
+.button.outline { 
+  border: 0px;
+  box-shadow: inset 0 0 0 1px var(--color-lightGrey);
 }
 
-@keyframes fade-in {
-    0% { opacity: 0;}
-    100% { opacity: 1;}
+.button.primary.outline {
+  border: 0px;
+  box-shadow: inset 0 0 0 1px var(--color-primary);
 }
 
-@keyframes slide-down {
-    0% { transform: translateY(-20px); }
-    100% { transform: translateY(0); }
+.nav {
+  position: fixed; 
+  bottom: 0; 
+  width: 100%;
+  animation: fade-ine 2s ease;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 50%,rgba(255,255,255,1) 100%); 
 }
+
+
