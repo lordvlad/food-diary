@@ -1,11 +1,23 @@
 {
+    "version": 2,
     "name": "food-diary",
     "alias": "food-diary.now.sh",
+    "builds": [
+        {"src": "public/**/*", "use": "@now/static"},
+        {"src": "api/**", "use": "@now/node"}
+    ],
+    "routes": [
+        {"src": "/api/(?<path>.+)", "dest": "/api/$path.js"},
+        {"src": "/img/(?<file>.+)", "dest": "/public/img/$file"},
+        {"src": "/img", "dest": "/public/index.html"},
+        {"src": "/(?<file>.+)", "dest": "/public/$file"},
+        {"src": "/", "dest": "/public/index.html"}
+    ],
     "env": { 
+        "KEYVALUE_XYZ_URL": "@keyvalue_xyz_url",
         "GCM_API_KEY": "@gcm_api_key",
         "VAPID_PUBLIC_KEY": "@vapid_public_key",
         "VAPID_PRIVATE_KEY": "@vapid_private_key",
-        "NODE_ENV": "production",
-        "NOTIFICATION_INTERVAL_MINUTES": "60"
+        "NODE_ENV": "production"
     }
 }
