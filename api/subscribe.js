@@ -4,7 +4,6 @@ const fetch = require('node-fetch')
 
 module.exports = async (req, res) => {
   try {
-    console.log('subscribing')
     const subscription = await json(req)
     const { endpoint } = subscription
     const filter = s => s.endpoint !== endpoint
