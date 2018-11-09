@@ -19,11 +19,11 @@ const subscribe = async () => {
   const permission = await Notification.requestPermission()
   if (permission !== 'granted') throw new Error('denied')
   const registration = await navigator.serviceWorker.ready
-  const publicKey = await (await fetch('/publicKey')).text()
+  const publicKey = await (await fetch('/api/publicKey')).text()
   const appServerKey = urlBase64ToUint8Array(publicKey)
   const subscription = await registration.pushManager.subscribe({ appServerKey, userVisibleOnly: true })
   const body = stringify(subscription)
-  const response = await fetch('/subscribe', { method: 'POST', body })
+  const response = await fetch('/api/subscribe', { method: 'POST', body })
   return { subscription, response }
 }
 
@@ -35,7 +35,7 @@ export const store = async (state, emitter) => {
   on(checkSubscription, async () => {
     if (!notifications.subscription) return
     const body = stringify(notifications.subscription)
-    const response = await fetch('/checkSubscription', { method: 'POST', body })
+    const response = await fetch('/api/checkSubscription', { method: 'POST', body })
     if (response.ok) return
     try {
       const { response, subscription } = await subscribe()
@@ -50,7 +50,7 @@ export const store = async (state, emitter) => {
   on(disableNotifications, async ({ resolve } = {}) => {
     if (notifications.subscription) {
       const body = stringify(notifications.subscription)
-      const response = await fetch('/unsubscribe', { method: 'POST', body })
+      const response = await fetch('/api/unsubscribe', { method: 'POST', body })
       if (!response.ok) console.error(response)
       notifications.subscription = null
     }

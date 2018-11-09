@@ -1,13 +1,23 @@
+const outdent = require('outdent')
+const fetch = require('node-fetch')
 const { generateVAPIDKeys } = require('web-push')
-const { appendFileSync } = require('fs')
 const { createInterface } = require('readline')
 
-const rl = createInterface({input: process.stdin, output: process.stdout})
+;(async () => {
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
 
-rl.question('Enter GCM API Key: ', gcmApiKey => {
-  const keys = generateVAPIDKeys()
-  appendFileSync('.gcm_api_key', gcmApiKey)
-  appendFileSync('.vapid_public_key', keys.publicKey)
-  appendFileSync('.vapid_private_key', keys.privateKey)
-  rl.close()
-})
+  const xyzUrl = await (await fetch('https://api.keyvalue.xyz/new/food-diary', { method: 'POST' })).text()
+
+  rl.question('Enter GCM API Key: ', gcmApiKey => {
+    const keys = generateVAPIDKeys()
+    console.log(outdent`
+    now you need to execute:
+      now secret add NODE_ENV production
+      now secret add GCM_API_KEY j${gcmApiKey}
+      now secret add VAPID_PUBLIC_KEY ${keys.publicKey}
+      now secret add VAPID_PRIVATE_KEY ${keys.privateKey}
+      now secret add KEYVALUE_XYZ_URL ${xyzUrl}
+    `)
+    rl.close()
+  })
+})()

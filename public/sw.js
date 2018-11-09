@@ -21,7 +21,7 @@ const onClick = async () => {
 const onPush = async () => {
   console.log('woke up because of a push notification')
   const dateOfArrival = Date.now()
-  const response = await fetch(`/echo?cacheBuster=${dateOfArrival}`)
+  const response = await fetch(`/api/echo?cacheBuster=${dateOfArrival}`)
   if (response.ok) console.log('server alive')
   else console.error(response)
   const tag = 'entry'
