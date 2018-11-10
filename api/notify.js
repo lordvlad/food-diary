@@ -1,7 +1,8 @@
 const { send } = require('micro')
 const { load } = require('./store.js')
-const webpush = require('web-push')
+const webpush = require('@lordvlad/web-push')
 const { GCM_API_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } = process.env
+
 webpush.setVapidDetails('http://food-diary.now.sh', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 webpush.setGCMAPIKey(GCM_API_KEY)
 

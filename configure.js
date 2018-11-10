@@ -1,6 +1,6 @@
 const outdent = require('outdent')
 const fetch = require('node-fetch')
-const { generateVAPIDKeys } = require('web-push')
+const { generateVAPIDKeys } = require('@lordvlad/web-push')
 const { createInterface } = require('readline')
 
 ;(async () => {
