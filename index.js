@@ -14,12 +14,12 @@ const staticServer = (req, res) => serveHandler(req, res, staticOptions)
  * configure routes for micro
  */
 const routes = router(
-  post('/subscribe', require('./api/subscribe.js')),
-  post('/unsubscribe', require('./api/unsubscribe.js')),
-  post('/checkSubscription', require('./api/checkSubscription.js')),
-  get('/health', require('./api/health.js')),
-  get('/publicKey', require('./api/publicKey.js')),
-  get('/notify', require('./api/notify.js')),
+  post('/api/subscribe', require('./api/subscribe.js')),
+  post('/api/unsubscribe', require('./api/unsubscribe.js')),
+  post('/api/checkSubscription', require('./api/checkSubscription.js')),
+  get('/api/health', require('./api/health.js')),
+  get('/api/publicKey', require('./api/publicKey.js')),
+  get('/api/notify', require('./api/notify.js')),
   get('/*', staticServer)
 )
 
