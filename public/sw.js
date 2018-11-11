@@ -25,7 +25,7 @@ const onPush = async () => {
   if (response.ok) console.log('server alive')
   else console.error(response)
   const tag = 'entry'
-  const icon = 'icon-128.png'
+  const icon = 'img/icon-128.png'
   const data = { dateOfArrival, primaryKey: '2' }
   const { title, body } = await getMessage()
   if (!title) return
