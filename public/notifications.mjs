@@ -49,6 +49,9 @@ export const store = async (state, emitter) => {
 
   on(disableNotifications, async ({ resolve } = {}) => {
     if (notifications.subscription) {
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.getSubscription()
+      if (subscription) await subscription.unsubscribe()
       const body = stringify(notifications.subscription)
       const response = await fetch('/api/unsubscribe', { method: 'POST', body })
       if (!response.ok) console.error(response)
