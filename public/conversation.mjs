@@ -38,8 +38,8 @@ export const store = (state, emitter) => {
       emit(addMessage, { message: `Wasn't that hard, was it? Simply record your meals and 
         your headaches and stomach troubles, and we'll figure this out together.` })
       await defer(resolve => emit(askForNotifications, { resolve }))
-      emit(addMessage, {message: `And worry not about your privacy, all your records stay
-        on your device.`})
+      emit(addMessage, { message: `And worry not about your privacy, all your records stay
+        on your device.` })
       emit(addMessage, {
         message: `You will find all your records in the <b>diary</b> tab.
         As well as options to configure your food diary.`,
