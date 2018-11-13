@@ -12,10 +12,7 @@ export const events = { addMessage }
 export const view = state => {
   const toIcon = icon => !icon ? '' : icon.nodeName ? icon : icon.call ? icon() : `[ICON ${icon}]`
   const questionCard = m => {
-    // FIXME enable suggestions
-    // const { disabled, icon, resolve, question, value, suggestion } = m
-    const { disabled, icon, resolve, question, value } = m
-    const suggestion = null
+    const { disabled, icon, resolve, question, value, suggestion } = m
     const id = (m.id || (m.id = randomId()))
     const focus = () => $(id).focus()
     const blur = () => $(id).blur()
