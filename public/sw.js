@@ -1,18 +1,97 @@
-/* globals idbKeyval, workbox, importScripts, fetch, clients, self */
+/* globals URLSearchParams, Response, idbKeyval, workbox, importScripts, self */
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.1/workbox-sw.js')
 importScripts('https://unpkg.com/idb-keyval@3.1.0/dist/idb-keyval-iife.js')
 
-const { routing, strategies } = workbox
-const { get } = idbKeyval
+workbox.setConfig({ debug: false })
 
-routing.registerRoute(/.*\.(json|mjs|js|css|html).*/, strategies.staleWhileRevalidate())
-routing.registerRoute(/.*\.svg.*/, strategies.cacheFirst())
-routing.registerRoute('/', strategies.staleWhileRevalidate())
+const { registration, clients, skipWaiting } = self
+const { core, routing, strategies } = workbox
+const { Store, keys, del, clear, set, get } = idbKeyval
+const { stringify } = JSON
+const addEventListener = self.addEventListener.bind(self)
+const registerRoute = routing.registerRoute.bind(routing)
+const staleWhileRevalidate = strategies.staleWhileRevalidate.bind(strategies)
+const cacheFirst = strategies.cacheFirst.bind(strategies)
 
-self.addEventListener('notificationclick', e => { e.notification.close(); e.waitUntil(onClick()) })
-self.addEventListener('push', e => e.waitUntil(onPush()))
+core.setLogLevel(core.LOG_LEVELS.error)
 
-const onClick = async () => {
+const queryParams = url => {
+  const o = {}
+  for (const [k, v] of url.searchParams.entries()) o[k] = v
+  return o
+}
+
+class StoreRestAdapter {
+  constructor (name) { this._store = new Store(name, name) }
+  async getItem (key) { return get(key, this._store) }
+  async del (key) { return del(key, this._store) }
+  async set (key, val) { return set(key, val, this._store) }
+  async keys () { return keys(this._store) }
+  async clear () { return clear(this._store) }
+  async * entries ({ min = 0, max = Number.POSITIVE_INFINITY }) {
+    let i = -1
+    for (const k of await this.keys()) {
+      i++
+      if (i < min) continue
+      if (i >= max) return
+      yield [k, await this.getItem(k)]
+    }
+  }
+  async DELETE ({ params: [key] }) { await this.del(key); return new Response(null) }
+  async GET ({ query, params }) {
+    const headers = { 'Content-Type': 'application/json' }
+    if (params[1]) {
+      const key = params[1]
+      const item = await this.getItem(key)
+      const body = item ? stringify(item) : null
+      const status = item ? 200 : 404
+      return new Response(body, { status, headers })
+    }
+    const pageSize = parseInt(query.pageSize || 40)
+    const min = parseInt(query.page || 0) * pageSize
+    const max = min + pageSize
+    const collectArray = async _ => {
+      const array = []
+      for await (const [, v] of this.entries({ min, max })) {
+        array.push(v)
+      }
+      return array
+    }
+    const collectObject = async _ => {
+      const object = {}
+      for await (const [k, v] of this.entries({ min, max })) {
+        object[k] = v
+      }
+      return object
+    }
+    const body = stringify(await (query.object ? collectObject() : collectArray()))
+    const init = { status: 200, headers }
+    return new Response(body, init)
+  }
+  async POST ({ params, event: { request } }) {
+    const entry = await request.json()
+    const key = params[1] || entry.key || entry.time
+    await this.set(key, entry)
+    return new Response('ok', { status: 200 })
+  }
+}
+
+const stores = new Proxy({}, {
+  get: (cache, key) => {
+    if (!cache[key]) cache[key] = new StoreRestAdapter(key)
+    return cache[key]
+  }
+})
+
+const storeHandler = async ({ url, event, params }) => {
+  const method = event.request.method
+  const query = queryParams(url)
+  const store = params[0].replace(url.search, '')
+  return stores[store][method]({ url, event, params, query })
+}
+
+const onClick = async e => {
+  e.notification.close()
   const clientList = await clients.matchAll({ type: 'window' })
   for (let client of clientList) { if (client.url === '/' && 'focus' in client) return client.focus() }
   if (clients.openWindow) return clients.openWindow('https://food-diary.now.sh')
@@ -21,15 +100,12 @@ const onClick = async () => {
 const onPush = async () => {
   console.log('woke up because of a push notification')
   const dateOfArrival = Date.now()
-  const response = await fetch(`/api/echo?cacheBuster=${dateOfArrival}`)
-  if (response.ok) console.log('server alive')
-  else console.error(response)
   const tag = 'entry'
   const icon = 'img/icon-128.png'
   const data = { dateOfArrival, primaryKey: '2' }
   const { title, body } = await getMessage()
   if (!title) return
-  await self.registration.showNotification(title, { body, tag, icon, data })
+  await registration.showNotification(title, { body, tag, icon, data })
 }
 
 const getMessage = async () => {
@@ -61,3 +137,26 @@ const getMessage = async () => {
       return {}
   }
 }
+
+const onInstall = async _ => {
+  for (const k of ['options', 'entries']) await stores[k].keys()
+  skipWaiting()
+}
+
+const onActivate = async _ => {
+  await clients.claim()
+}
+
+addEventListener('notificationclick', e => e.waitUntil(onClick(e)))
+addEventListener('push', e => e.waitUntil(onPush()))
+addEventListener('activate', e => e.waitUntil(onActivate()))
+addEventListener('install', e => e.waitUntil(onInstall()))
+
+registerRoute(/.*\.(json|mjs|js|css|html).*/, staleWhileRevalidate())
+registerRoute(/.*\.svg.*/, cacheFirst())
+registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'GET')
+registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'POST')
+registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'GET')
+registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'POST')
+registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'DELETE')
+registerRoute('/', staleWhileRevalidate())

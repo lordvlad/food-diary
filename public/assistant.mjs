@@ -12,13 +12,16 @@ export const events = { addMessage }
 export const view = state => {
   const toIcon = icon => !icon ? '' : icon.nodeName ? icon : icon.call ? icon() : `[ICON ${icon}]`
   const questionCard = m => {
+    // FIXME enable suggestions
+    // const { disabled, icon, resolve, question, value, suggestion } = m
     const { disabled, icon, resolve, question, value } = m
+    const suggestion = null
     const id = (m.id || (m.id = randomId()))
     const focus = () => $(id).focus()
     const blur = () => $(id).blur()
     const keydown = e => { if (e.keyCode === 13) enter(e) }
     const input = html`<input ${disabled ? 'readonly' : ''} 
-      value=${value || ''} id=${id} type=text onkeydown=${keydown}>`
+      value=${value || (suggestion && suggestion.join(', ')) || ''} id=${id} type=text onkeydown=${keydown}>`
     const enter = e => {
       e.preventDefault()
       m.disabled = true

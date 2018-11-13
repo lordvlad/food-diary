@@ -3,12 +3,10 @@ import { i, defer, immediate, autobind } from './util.mjs'
 import { events as assistantEvents } from './assistant.mjs'
 import { events as optionEvents } from './options.mjs'
 import { events as diaryEvents } from './diary.mjs'
-import { events as notificationEvents } from './notifications.mjs'
 
 const { addMessage } = assistantEvents
-const { askForNotifications, checkSubscription } = notificationEvents
 const { addEntry, askForMeal, askForRecord } = diaryEvents
-const { setSetupComplete, setName } = optionEvents
+const { askForNotifications, checkSubscription, setSetupComplete, setName, loadComplete } = optionEvents
 
 const welcome = 'welcome'
 const askForName = 'askForName'
@@ -18,6 +16,8 @@ export const events = { welcome, askForName, askForFirstMeal }
 
 export const store = (state, emitter) => {
   const { on, emit } = autobind(emitter)
+
+  on(loadComplete, _ => emit(welcome))
 
   on(welcome, async () => {
     const { name } = (state.options || {})

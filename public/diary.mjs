@@ -1,15 +1,16 @@
+/* globals fetch */
 import fromNow from 'https://unpkg.com/fromnow@3.0.0/dist/fromnow.mjs'
-import { stomachAdjectives, stomachNouns, headNouns, headAdjectives,
-  severities, render, defer, autobind, hidden, html, i, drinkSizes } from './util.mjs'
-import { events as idbEvents } from './idb.mjs'
 import { events as assistantEvents } from './assistant.mjs'
+import { stomachAdjectives, stomachNouns, headNouns, headAdjectives,
+  severities, render, defer, autobind, hidden, html, i, drinkSizes,
+  later } from './util.mjs'
 
 const SECONDS = 1000
 const MINUTES = SECONDS * 60
 const HOURS = MINUTES * 60
 const { addMessage } = assistantEvents
-const { save } = idbEvents
 const { assign } = Object
+const { stringify } = JSON
 
 const askForTime = 'askForTime'
 const addEntry = 'addEntry'
@@ -21,18 +22,42 @@ const askForDrink = 'askForDrink'
 const askForStomachAche = 'askForStomachAche'
 const askForHeadache = 'askForHeadache'
 
+const hash = s => [].reduce.call(s, (p, c, i, a) => (p << 5) - p + a.charCodeAt(i), 0)
+
 export const events = { addEntry, askForMeal, askForRecord }
+
+const getRecipie = async dish => {
+  const key = hash(dish.toLowerCase())
+  const suggestionResponse = await fetch(`/store/recipies/${key}`)
+  return suggestionResponse.ok ? suggestionResponse.json() : []
+}
 
 export const store = (state, emitter) => {
   const { on, emit } = autobind(emitter)
   const entries = []
   assign(state, { entries })
 
-  on(addEntry, e => {
+  later(async _ => {
+    const response = await fetch('/store/entries')
+    if (!response.ok) return
+    entries.length = 0
+    for (const e of await response.json()) entries.push(e)
+    emit(render)
+  })
+
+  on(addEntry, async e => {
+    const post = { method: 'POST' }
     entries.unshift(e)
-    emit(save)
     emit(recordEntry)
     emit(render)
+    const key = hash(e.foodType.toLowerCase())
+    Promise.all([
+      fetch('/store/entries', { ...post, body: stringify(e) }),
+      fetch(`/store/recipies/${key}`, { ...post, body: stringify(e.ingredients) })
+    ]).catch(e => {
+      // FIXME add code to handle errors
+      console.error(e)
+    })
   })
 
   on(askForHeadache, async ({ resolve }) => {
@@ -159,12 +184,13 @@ export const store = (state, emitter) => {
       const question = `Tell me the general type of the dish. Was it a 
       stew or a pie or some curry, for example.`
       const answer = await defer(resolve => emit(addMessage, { icon, question, resolve }))
-      entry.foodType = answer.split(/\s*,\s*/)
+      entry.foodType = answer
     }
     {
+      const suggestion = await getRecipie(entry.foodType)
       const icon = i.silverware
       const question = `Tell me the ingredients.`
-      const answer = await defer(resolve => emit(addMessage, { icon, question, resolve }))
+      const answer = await defer(resolve => emit(addMessage, { icon, question, resolve, suggestion }))
       entry.ingredients = answer.split(/\s*,\s*/)
     }
     {
@@ -198,7 +224,7 @@ export const view = (state, emit) => html`
       </p>
       ${!e.foodType ? '' : html`
         <p>
-          ${i.silverware()} ${e.foodType.join(', ')}
+          ${i.silverware()} ${e.foodType}
           <span class=text-grey> (${(e.ingredients || []).join(', ')})</span>
         </p> 
       `}
