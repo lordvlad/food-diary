@@ -98,3 +98,5 @@ export const assignDeep = (target, ...args) => {
   }
   return target
 }
+
+export const later = fn => setTimeout(fn, 100)
