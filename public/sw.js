@@ -153,7 +153,7 @@ addEventListener('activate', e => e.waitUntil(onActivate()))
 addEventListener('install', e => e.waitUntil(onInstall()))
 
 registerRoute(/.*\.(json|mjs|js|css|html).*/, staleWhileRevalidate())
-registerRoute(/.*\.svg.*/, cacheFirst())
+registerRoute(/.*\.(svg|png).*/, cacheFirst())
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'POST')
 registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'GET')
