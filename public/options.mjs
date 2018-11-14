@@ -1,10 +1,10 @@
 /* global Notification, fetch */
-import { urlBase64ToUint8Array, later, render, raw, autobind,
-  hidden, html, i, contact, defer } from './util.mjs'
+import { later, render, raw, autobind,
+  hidden, html, i, defer } from './util.mjs'
 import { events as assistantEvents } from './assistant.mjs'
 
 const { assign } = Object
-const { parse, stringify } = JSON
+const { stringify } = JSON
 const { addMessage } = assistantEvents
 
 const reset = 'reset'
@@ -27,18 +27,6 @@ export const events = {
   askForNotifications,
   reset,
   checkSubscription
-}
-
-const subscribe = async () => {
-  const permission = await Notification.requestPermission()
-  if (permission !== 'granted') throw new Error('denied')
-  const registration = await navigator.serviceWorker.ready
-  const publicKey = await (await fetch('/api/publicKey')).text()
-  const appServerKey = urlBase64ToUint8Array(publicKey)
-  const subscription = await registration.pushManager.subscribe({ appServerKey, userVisibleOnly: true })
-  const body = stringify(subscription)
-  const response = await fetch('/api/subscribe', { method: 'POST', body })
-  return { subscription, response }
 }
 
 export const store = async (state, emitter) => {
@@ -69,70 +57,41 @@ export const store = async (state, emitter) => {
   on(enableNotifications, _ => emit(setWantsNotifications, true))
   on(disableNotifications, _ => emit(setWantsNotifications, false))
 
-  on(disableNotifications, async ({ resolve } = {}) => {
-    if (options.subscription) {
-      const registration = await navigator.serviceWorker.ready
-      const subscription = await registration.pushManager.getSubscription()
-      if (subscription) await subscription.unsubscribe()
-      const body = stringify(options.subscription)
-      const response = await fetch('/api/unsubscribe', { method: 'POST', body })
-      if (!response.ok) console.error(response)
-      options.subscription = null
-    }
-    if (resolve) resolve(false)
+  on(disableNotifications, async _ => {
+    const reg = await navigator.serviceWorker.ready
+    reg.sync.register('unsubscribe')
   })
 
-  on(checkSubscription, async () => {
-    if (!options.subscription) return
-    const body = stringify(options.subscription)
-    const response = await fetch('/api/checkSubscription', { method: 'POST', body })
-    if (response.ok) return
-    try {
-      const { response, subscription } = await subscribe()
-      if (!response.ok) return console.error(response)
-      options.subscription = parse(stringify(subscription))
-    } catch (e) {
-      console.error(e)
-    }
+  on(checkSubscription, async _ => {
+    const reg = await navigator.serviceWorker.ready
+    reg.sync.register('checkSubscription')
   })
 
   on(enableNotifications, async ({ resolve, reject } = {}) => {
-    try {
-      const { response, subscription } = await subscribe()
-      if (response.ok) {
-        const message = `Notifications successfully set up`
-        options.subscription = parse(stringify(subscription))
-        emit(addMessage, { message, icon: i.cellphoneMessage })
-        if (resolve) resolve(true)
-      } else {
-        const message = `Notifications were not set up successfully. Try again 
-          in a little while or ${contact}.`
-        options.subscription = null
-        emit(addMessage, { message, icon: i.cellphoneMessage })
-        console.error(response)
-        if (resolve) resolve(false)
-      }
-    } catch (e) {
-      reject(e)
-    }
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') { if (reject) return reject(); else return }
+    const reg = await navigator.serviceWorker.ready
+    reg.sync.register('subscribe')
+    if (resolve) resolve()
   })
 
   on(askForNotifications, async ({ resolve }) => {
-    const reject = () => {
+    const reject = resolve => {
       const message = `That's okay if you don't want notifications, but 
         keep in mind that you'll need to track your meals regularly to find patterns. 
         You can set up notifications via diary > options if you change your mind.`
-      emit(disableNotifications)
       emit(addMessage, { icon: i.cellphoneMessage, message })
-      resolve(false)
+      emit(disableNotifications)
+      resolve()
     }
     const choices = ['Yes, set up notifications', 'No, I don\'t want notifications']
     const question = `Food diary can remind you to track your meals. 
-      You can always change your preference in the settings, should you change 
+      You can always change your preference in the options, should you change 
       your mind. Do you want to set up notifications now?`
     const wantsNotifications = await defer(resolve => emit(addMessage, { resolve, icon: i.cellphoneMessage, choices, question }))
     if (wantsNotifications !== choices[0]) return reject()
     emit(enableNotifications, { resolve, reject })
+    resolve(true)
   })
 
   later(async _ => {

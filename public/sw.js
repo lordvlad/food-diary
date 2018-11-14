@@ -1,4 +1,4 @@
-/* globals URLSearchParams, Response, idbKeyval, workbox, importScripts, self */
+/* globals atob, fetch, URLSearchParams, Response, idbKeyval, workbox, importScripts, self */
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.6.1/workbox-sw.js')
 importScripts('https://unpkg.com/idb-keyval@3.1.0/dist/idb-keyval-iife.js')
 
@@ -7,11 +7,13 @@ workbox.setConfig({ debug: false })
 const { registration, clients, skipWaiting } = self
 const { core, routing, strategies } = workbox
 const { Store, keys, del, clear, set, get } = idbKeyval
-const { stringify } = JSON
+const { parse, stringify } = JSON
 const addEventListener = self.addEventListener.bind(self)
 const registerRoute = routing.registerRoute.bind(routing)
 const staleWhileRevalidate = strategies.staleWhileRevalidate.bind(strategies)
 const cacheFirst = strategies.cacheFirst.bind(strategies)
+
+let publicKey = null
 
 core.setLogLevel(core.LOG_LEVELS.error)
 
@@ -140,6 +142,7 @@ const getMessage = async () => {
 
 const onInstall = async _ => {
   for (const k of ['options', 'entries']) await stores[k].keys()
+  publicKey = await (await fetch('/api/publicKey')).text()
   skipWaiting()
 }
 
@@ -147,10 +150,54 @@ const onActivate = async _ => {
   await clients.claim()
 }
 
+const urlBase64ToUint8Array = (base64String) => {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+
+  const rawData = atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+const subscribe = async _ => {
+  let subscription = await registration.pushManager.getSubscription()
+  if (subscription) {
+    const body = stringify(subscription)
+    const response = await fetch('/api/checkSubscription', { method: 'POST', body })
+    if (response.ok) return
+  }
+  const applicationServerKey = urlBase64ToUint8Array(publicKey)
+  const userVisibleOnly = true
+  subscription = await registration.pushManager.subscribe({ applicationServerKey, userVisibleOnly })
+  const body = stringify(subscription)
+  const response = await fetch('/api/subscribe', { method: 'POST', body })
+  if (!response.ok) console.error(response)
+}
+
+const unsubscribe = async _ => {
+  const subscription = await registration.pushManager.getSubscription()
+  if (subscription) {
+    await subscription.unsubscribe()
+    const body = stringify(subscription)
+    const response = await fetch('/api/unsubscribe', { method: 'POST', body })
+    if (!response.ok) console.error(response)
+  }
+}
+
+const onSync = async e => {
+  if (e.tag === 'subscribe' || e.tag === 'checkSubscription') subscribe()
+  if (e.tag === 'unsubscribe') unsubscribe()
+}
+
 addEventListener('notificationclick', e => e.waitUntil(onClick(e)))
-addEventListener('push', e => e.waitUntil(onPush()))
-addEventListener('activate', e => e.waitUntil(onActivate()))
-addEventListener('install', e => e.waitUntil(onInstall()))
+addEventListener('push', e => e.waitUntil(onPush(e)))
+addEventListener('activate', e => e.waitUntil(onActivate(e)))
+addEventListener('install', e => e.waitUntil(onInstall(e)))
+addEventListener('sync', e => e.waitUntil(onSync(e)))
 
 registerRoute(/.*\.(json|mjs|js|css|html).*/, staleWhileRevalidate())
 registerRoute(/.*\.(svg|png).*/, cacheFirst())
