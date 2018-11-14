@@ -1,4 +1,7 @@
 /* global location */
+import 'https://unpkg.com/nanochoo@6.13.0/dist/bundle.js'
+import 'https://unpkg.com/nanohtml@1.2.6/dist/bundle.js'
+
 import { render, reload, autobind, active, choo, html } from './util.mjs'
 
 import { store as assistantStore, view as assistantView } from './assistant.mjs'

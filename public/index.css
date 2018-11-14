@@ -1,3 +1,5 @@
+@import "https://unpkg.com/chota@0.5.2/dist/chota.min.css";
+
 :root {
   --grid-maxWidth: 54rem; /* max container width 540px */
   --color-primary: #FF770D;
