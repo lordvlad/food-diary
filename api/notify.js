@@ -1,4 +1,3 @@
-const { parse } = require('url')
 const { send } = require('micro')
 const fetch = require('node-fetch').default
 const webpush = require('@lordvlad/web-push')
@@ -21,8 +20,7 @@ module.exports = async (req, res) => {
         console.log(`[OK]   ${endpoint} notified`)
       } catch (e) {
         console.error(`[FAIL] ${endpoint} not notified: ${e.message}`)
-        const u = parse(req.url)
-        await fetch(`${u.protocol}://${u.host}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
+        await fetch(`${process.env.NOW_URL}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
       }
     }
     send(res, 200)
