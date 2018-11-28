@@ -12,7 +12,7 @@ const store = async subscriptions => {
   console.log(`storing ${subscriptions.length} subscriptions to ${storeUrl}`)
   const body = stringify(subscriptions)
   const response = await fetch(storeUrl, { method: 'POST', body })
-  if (!response.ok) return Promise.reject(response.statusText)
+  if (!response.ok) throw new Error(response.statusText)
 }
 
 module.exports = { store, load }
