@@ -1,7 +1,5 @@
 const fetch = require('node-fetch').default
-
 const { stringify } = JSON
-
 const storeUrl = process.env.KEYVALUE_XYZ_URL
 
 const load = async _ => {
