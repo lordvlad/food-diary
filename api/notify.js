@@ -10,6 +10,7 @@ webpush.setVapidDetails('http://food-diary.now.sh', VAPID_PUBLIC_KEY, VAPID_PRIV
 webpush.setGCMAPIKey(GCM_API_KEY)
 
 module.exports = async (req, res) => {
+  console.log(req.url, parse(req.url))
   try {
     const payload = 'wake up!'
     const subscriptions = await load()
