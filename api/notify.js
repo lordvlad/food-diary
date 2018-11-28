@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
   try {
     const payload = 'wake up!'
     const subscriptions = await load()
-    console.log(`[]     Broadcasting to ${subscriptions.size} clients`)
+    console.log(`[]     Broadcasting to ${subscriptions.length} clients`)
     for (let subscription of subscriptions) {
       const { endpoint } = subscription
       try {
