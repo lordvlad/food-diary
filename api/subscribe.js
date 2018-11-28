@@ -7,14 +7,12 @@ module.exports = async (req, res) => {
     const subscription = await json(req)
     const { endpoint } = subscription
     const filter = s => s.endpoint !== endpoint
-    const subscriptions = (await load()).filter(filter)
-    subscriptions.push(subscription)
-    await store(subscriptions)
+    await store([...(await load()).filter(filter), subscription])
     console.log(`[+]    ${endpoint} subscribed`)
     setTimeout(() => fetch(`${process.env.NOW_URL}/api/notify`), 1000)
     send(res, 200)
   } catch (e) {
-    console.error(`[FAIL] ${e.message}`)
+    console.error(`[FAIL] ${e.stack}`)
     send(res, 500)
   }
 }
