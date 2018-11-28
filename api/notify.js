@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
         await webpush.sendNotification(subscription, payload)
         console.log(`[OK]   ${endpoint} notified`)
       } catch (e) {
-        console.error(`[FAIL] ${endpoint} not notified: ${e.message}`)
+        console.error(`[FAIL] ${endpoint} not notified: ${e.stack}`)
         await fetch(`${APP_URL}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
       }
     }
