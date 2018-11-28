@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     console.log(`[-]    ${endpoint} unsubscribed`)
     send(res, 200)
   } catch (e) {
-    console.error(`[FAIL] ${e.message}`)
+    console.error(`[FAIL] ${e.stack}`)
     send(res, 500)
   }
 }
