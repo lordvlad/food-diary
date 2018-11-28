@@ -1,5 +1,4 @@
 const { json, send } = require('micro')
-const { parse } = require('url')
 const { store, load } = require('./store')
 const fetch = require('node-fetch').default
 const { APP_URL } = process.env

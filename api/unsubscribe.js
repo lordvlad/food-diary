@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   try {
     const { endpoint } = await json(req)
     const filter = s => s.endpoint !== endpoint
-    await store(subscriptions = (await load()).filter(filter))
+    await store((await load()).filter(filter))
     console.log(`[-]    ${endpoint} unsubscribed`)
     send(res, 200)
   } catch (e) {

@@ -1,5 +1,4 @@
 const { send } = require('micro')
-const { parse } = require('url')
 const fetch = require('node-fetch').default
 const webpush = require('@lordvlad/web-push')
 const { load } = require('./store')
