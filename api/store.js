@@ -1,6 +1,7 @@
-const fetch = require('node-fetch').default
+const fetchModule = require('node-fetch')
 const { stringify } = JSON
 const storeUrl = process.env.KEYVALUE_XYZ_URL
+const fetch = fetchModule && fetchModule.default || fetchModule
 
 const load = async _ => {
   const response = await fetch(storeUrl)

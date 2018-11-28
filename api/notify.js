@@ -1,9 +1,10 @@
 const { send } = require('micro')
-const fetch = require('node-fetch').default
+const fetchModule = require('node-fetch')
 const webpush = require('@lordvlad/web-push')
 const { load } = require('./store')
 const { stringify } = JSON
 const { GCM_API_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, APP_URL } = process.env
+const fetch = fetchModule && fetchModule.default || fetchModule
 
 webpush.setVapidDetails('http://food-diary.now.sh', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 webpush.setGCMAPIKey(GCM_API_KEY)
