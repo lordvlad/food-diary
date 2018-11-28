@@ -1,5 +1,5 @@
 const { json, send } = require('micro')
-const { store, load } = require('./store.js')
+const { store, load } = require('./store')
 
 module.exports = async (req, res) => {
   try {

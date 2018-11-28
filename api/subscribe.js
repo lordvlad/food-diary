@@ -1,6 +1,6 @@
 const { json, send } = require('micro')
-const { store, load } = require('./store.js')
-const fetch = require('node-fetch')
+const { store, load } = require('./store')
+const fetch = require('node-fetch').default
 
 module.exports = async (req, res) => {
   try {
