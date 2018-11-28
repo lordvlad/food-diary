@@ -4,14 +4,12 @@ const fetch = require('node-fetch').default
 const webpush = require('@lordvlad/web-push')
 const { load } = require('./store')
 const { stringify } = JSON
-const { GCM_API_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY } = process.env
+const { GCM_API_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, APP_URL } = process.env
 
 webpush.setVapidDetails('http://food-diary.now.sh', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 webpush.setGCMAPIKey(GCM_API_KEY)
 
 module.exports = async (req, res) => {
-  console.log(process.env)
-  console.log(req.url, parse(req.url))
   try {
     const payload = 'wake up!'
     const subscriptions = await load()
@@ -23,9 +21,7 @@ module.exports = async (req, res) => {
         console.log(`[OK]   ${endpoint} notified`)
       } catch (e) {
         console.error(`[FAIL] ${endpoint} not notified: ${e.message}`)
-        const u = parse(req.url)
-        console.log(`unsubscribing ${u.protocol}://${u.host}/api/unsubscribe`)
-        await fetch(`${u.protocol}://${u.host}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
+        await fetch(`${APP_URL}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
       }
     }
     send(res, 200)
