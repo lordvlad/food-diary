@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
       } catch (e) {
         console.error(`[FAIL] ${endpoint} not notified: ${e.message}`)
         const u = parse(req.url)
-        await fetch(`${u.protocol}://${u.host}/api/unsubscribe`, { body: stringify({ endpoint }) })
+        await fetch(`${u.protocol}://${u.host}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
       }
     }
     send(res, 200)
