@@ -1,4 +1,5 @@
 const { json, send } = require('micro')
+const { parse } = require('url')
 const { store, load } = require('./store')
 const fetch = require('node-fetch').default
 
@@ -9,7 +10,8 @@ module.exports = async (req, res) => {
     const filter = s => s.endpoint !== endpoint
     await store([...(await load()).filter(filter), subscription])
     console.log(`[+]    ${endpoint} subscribed`)
-    setTimeout(() => fetch(`${process.env.NOW_URL}/api/notify`), 1000)
+    const u = parse(req.url)
+    setTimeout(() => fetch(`${u.protocol}://${u.host}/api/notify`), 1000)
     send(res, 200)
   } catch (e) {
     console.error(`[FAIL] ${e.stack}`)
