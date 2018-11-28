@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/lordvlad/food-diary#readme",
   "dependencies": {
-    "@lordvlad/web-push": "^3.4.0",
+    "@lordvlad/web-push": "^3.4.1",
     "micro": "^9.3.3",
     "node-fetch": "^2.3.0"
   },
