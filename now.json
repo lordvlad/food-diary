@@ -13,7 +13,8 @@
         {"src": "/(?<file>.+)", "dest": "/public/$file"},
         {"src": "/", "dest": "/public/index.html"}
     ],
-    "env": { 
+    "env": {
+        "APP_URL": "https://food-diary.now.sh",
         "KEYVALUE_XYZ_URL": "@keyvalue_xyz_url",
         "GCM_API_KEY": "@gcm_api_key",
         "VAPID_PUBLIC_KEY": "@vapid_public_key",
