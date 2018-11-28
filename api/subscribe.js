@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     subscriptions.push(subscription)
     await store(subscriptions)
     console.log(`[+]    ${endpoint} subscribed`)
-    setTimeout(() => fetch(`${process.env.NOW_URL}/notify`), 1000)
+    setTimeout(() => fetch(`${process.env.NOW_URL}/api/notify`), 1000)
     send(res, 200)
   } catch (e) {
     console.error(`[FAIL] ${e.message}`)
