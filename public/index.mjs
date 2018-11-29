@@ -29,8 +29,8 @@ const view = (state, emit) => {
           <div class=nav>
             <div class=nav-center>
               <div class=tabs>
-                <a onclick=${clickAssistant} class=${activeAssistant}>assistant</a>
-                <a onclick=${clickDiary} class=${activeDiary}>my diary</a>
+                <a href=# onclick=${clickAssistant} class=${activeAssistant}>assistant</a>
+                <a href=# onclick=${clickDiary} class=${activeDiary}>my diary</a>
               </div>
             </div>
           </div>
