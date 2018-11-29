@@ -13,8 +13,8 @@ const { keys, assign } = Object
 const app = choo()
 
 const view = (state, emit) => {
-  const clickDiary = e => e.preventDefault() && emit('tab', 'diary')
-  const clickAssistant = e => e.preventDefault() && emit('tab', 'assistant')
+  const clickDiary = e => { e.preventDefault(); emit('tab', 'diary') }
+  const clickAssistant = e => { e.preventDefault(); emit('tab', 'assistant') }
   const activeAssistant = state.tabs.assistant && active
   const activeDiary = state.tabs.diary && active
   const setupComplete = state.options.setupComplete
