@@ -1,3 +1,5 @@
 node_modules
 .env
 certs
+*lock.json
+*config.js
