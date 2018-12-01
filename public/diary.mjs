@@ -215,7 +215,7 @@ export const view = (state, emit) => html`
     <h4>
       <span>${state.entries.length} entries</span>
       <span class=pull-right>
-        <a href=# onclick=${e => e.preventDefault() && emit('tab', 'options')}>options</a>
+        <a href=# onclick=${e => { e.preventDefault(); emit('tab', 'options')}}>options</a>
       </span>
     </h4>
     ${state.entries.length ? state.entries.map(e => html`<p class=card>

@@ -13,8 +13,8 @@ const { keys, assign } = Object
 const app = choo()
 
 const view = (state, emit) => {
-  const clickDiary = e => e.preventDefault() && emit('tab', 'diary')
-  const clickAssistant = e => e.preventDefault() && emit('tab', 'assistant')
+  const clickDiary = e => { e.preventDefault(); emit('tab', 'diary') }
+  const clickAssistant = e => { e.preventDefault(); emit('tab', 'assistant') }
   const activeAssistant = state.tabs.assistant && active
   const activeDiary = state.tabs.diary && active
   const setupComplete = state.options.setupComplete
@@ -29,8 +29,8 @@ const view = (state, emit) => {
           <div class=nav>
             <div class=nav-center>
               <div class=tabs>
-                <a onclick=${clickAssistant} class=${activeAssistant}>assistant</a>
-                <a onclick=${clickDiary} class=${activeDiary}>my diary</a>
+                <a href=# onclick=${clickAssistant} class=${activeAssistant}>assistant</a>
+                <a href=# onclick=${clickDiary} class=${activeDiary}>my diary</a>
               </div>
             </div>
           </div>
