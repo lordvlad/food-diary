@@ -24,7 +24,10 @@
   "dependencies": {
     "@lordvlad/web-push": "^3.4.1",
     "micro": "^9.3.3",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.3.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^3.4.0"
   },
   "devDependencies": {
     "atob": "^2.1.2",
