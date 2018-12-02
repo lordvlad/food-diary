@@ -1,7 +1,7 @@
 import 'https://unpkg.com/nanochoo@6.13.0/dist/bundle.js'
 import 'https://unpkg.com/nanohtml@1.2.6/dist/bundle.js'
 
-import { reloader, offline, expose, choo, html } from './util.mjs'
+import { swMessages, reloader, offline, expose, choo, html } from './util.mjs'
 import { store as conversation } from './conversation.mjs'
 import * as assistant from './assistant.mjs'
 import * as options from './options.mjs'
@@ -21,6 +21,7 @@ const app = choo()
 
 app.use(reloader)
 app.use(offline)
+app.use(swMessages)
 app.use(conversation)
 app.use(expose)
 
