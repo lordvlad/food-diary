@@ -18,15 +18,15 @@ module.exports = async (req, res) => {
       const { endpoint } = subscription
       try {
         await webpush.sendNotification(subscription, payload)
-        console.log(`[OK]   ${endpoint} notified`)
+        console.log(`/notify [OK]   ${endpoint} notified`)
       } catch (e) {
-        console.error(`[FAIL] ${endpoint.substr(0, 64)} not notified: ${e.stack}`)
+        console.error(`/notify [FAIL] ${endpoint.substr(0, 64)} not notified: ${e.stack}`)
         await fetch(`${APP_URL}/api/unsubscribe`, { method: 'POST', body: stringify({ endpoint }) })
       }
     }
     send(res, 200)
   } catch (e) {
-    console.error(`[FAIL] ${e.stack}`)
+    console.error(`/notify [FAIL] ${e.stack}`)
     send(res, 500)
   }
 }

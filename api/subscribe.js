@@ -10,11 +10,11 @@ module.exports = async (req, res) => {
     const { endpoint } = subscription
     const filter = s => s.endpoint !== endpoint
     await store([...(await load()).filter(filter), subscription])
-    console.log(`[+]    ${endpoint.substr(0, 64)} subscribed`)
+    console.log(`/subscribe [OK]   ${endpoint.substr(0, 64)} subscribed`)
     setTimeout(() => fetch(`${APP_URL}/api/notify`), 1000)
     send(res, 200)
   } catch (e) {
-    console.error(`[FAIL] ${e.stack}`)
+    console.error(`/subscribe [FAIL] ${e.stack}`)
     send(res, 500)
   }
 }
