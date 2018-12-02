@@ -7,6 +7,7 @@ const { assign } = Object
 const { stringify } = JSON
 const { addMessage } = assistantEvents
 
+const update = 'update'
 const reset = 'reset'
 const setName = 'setName'
 const setWantsNotifications = 'setWantsNotifications'
@@ -55,6 +56,11 @@ export const store = async (state, emitter) => {
   on(setSubscription, set('subscription'))
   on(enableNotifications, _ => emit(setWantsNotifications, true))
   on(disableNotifications, _ => emit(setWantsNotifications, false))
+
+  on(update, async _ => {
+    const reg = await navigator.serviceWorker.ready
+    reg.update()
+  })
 
   on(disableNotifications, async _ => {
     const reg = await navigator.serviceWorker.ready
@@ -125,6 +131,12 @@ export const view = ({ tabs, options }, emit) => html`
           class="button primary ${options.wantsNotifications && 'outline'}">
         disabled
         </button>
+      </p>
+    </p>
+    <p class=card>
+      <p>Check for updates</p>
+      <p>
+        <button onclick=${() => emit(update)} class="button primary">update</button>
       </p>
     </p>
     <p class=card>
