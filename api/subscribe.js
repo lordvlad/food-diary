@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     const { endpoint } = subscription
     const filter = s => s.endpoint !== endpoint
     await store([...(await load()).filter(filter), subscription])
-    console.log(`[+]    ${endpoint} subscribed`)
+    console.log(`[+]    ${endpoint.substr(0, 64)} subscribed`)
     setTimeout(() => fetch(`${APP_URL}/api/notify`), 1000)
     send(res, 200)
   } catch (e) {
