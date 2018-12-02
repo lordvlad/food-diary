@@ -76,7 +76,7 @@ export const store = async (state, emitter) => {
   })
 
   on(askForNotifications, async ({ resolve }) => {
-    const reject = resolve => {
+    const reject = _ => {
       const message = `That's okay if you don't want notifications, but 
         keep in mind that you'll need to track your meals regularly to find patterns. 
         You can set up notifications via diary > options if you change your mind.`
