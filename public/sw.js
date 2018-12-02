@@ -7,7 +7,7 @@ workbox.setConfig({ debug: false })
 const { registration, clients, skipWaiting } = self
 const { core, routing, strategies } = workbox
 const { Store, keys, del, clear, set, get } = idbKeyval
-const { parse, stringify } = JSON
+const { stringify } = JSON
 const addEventListener = self.addEventListener.bind(self)
 const registerRoute = routing.registerRoute.bind(routing)
 const staleWhileRevalidate = strategies.staleWhileRevalidate.bind(strategies)
@@ -16,6 +16,10 @@ const cacheFirst = strategies.cacheFirst.bind(strategies)
 let publicKey = null
 
 core.setLogLevel(core.LOG_LEVELS.error)
+
+const postMessage = async msg => {
+  for (const client of await self.clients.matchAll()) client.postMessage(msg)
+}
 
 const queryParams = url => {
   const o = {}
@@ -106,8 +110,7 @@ const onPush = async () => {
   const icon = 'img/icon-128.png'
   const data = { dateOfArrival, primaryKey: '2' }
   const { title, body } = await getMessage()
-  if (!title) return
-  await registration.showNotification(title, { body, tag, icon, data })
+  if (title) await registration.showNotification(title, { body, tag, icon, data })
 }
 
 const getMessage = async () => {
@@ -144,11 +147,10 @@ const onInstall = async _ => {
   for (const k of ['options', 'entries']) await stores[k].keys()
   publicKey = await (await fetch('/api/publicKey')).text()
   skipWaiting()
+  postMessage({ toast: 'Webapp installed.' })
 }
 
-const onActivate = async _ => {
-  await clients.claim()
-}
+const onActivate = async _ => clients.claim()
 
 const urlBase64ToUint8Array = (base64String) => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4)
@@ -164,33 +166,34 @@ const urlBase64ToUint8Array = (base64String) => {
 }
 
 const subscribe = async _ => {
-  let subscription = await registration.pushManager.getSubscription()
-  if (subscription) {
-    const body = stringify(subscription)
+  const oldSubscription = await registration.pushManager.getSubscription()
+  if (oldSubscription) {
+    const body = stringify(oldSubscription)
     const response = await fetch('/api/checkSubscription', { method: 'POST', body })
     if (response.ok) return
   }
   const applicationServerKey = urlBase64ToUint8Array(publicKey)
   const userVisibleOnly = true
-  subscription = await registration.pushManager.subscribe({ applicationServerKey, userVisibleOnly })
+  const subscription = await registration.pushManager.subscribe({ applicationServerKey, userVisibleOnly })
   const body = stringify(subscription)
   const response = await fetch('/api/subscribe', { method: 'POST', body })
   if (!response.ok) console.error(response)
+  else postMessage({ toast: `Notifications ${oldSubscription ? 'reconfigured' : 'enabled'}.` })
 }
 
 const unsubscribe = async _ => {
   const subscription = await registration.pushManager.getSubscription()
-  if (subscription) {
-    await subscription.unsubscribe()
-    const body = stringify(subscription)
-    const response = await fetch('/api/unsubscribe', { method: 'POST', body })
-    if (!response.ok) console.error(response)
-  }
+  if (!subscription) return
+  await subscription.unsubscribe()
+  const body = stringify(subscription)
+  const response = await fetch('/api/unsubscribe', { method: 'POST', body })
+  if (!response.ok) console.error(response)
+  else postMessage({ toast: 'Notifications disabled.' })
 }
 
 const onSync = async e => {
   if (e.tag === 'subscribe' || e.tag === 'checkSubscription') subscribe()
-  if (e.tag === 'unsubscribe') unsubscribe()
+  else if (e.tag === 'unsubscribe') unsubscribe()
 }
 
 addEventListener('notificationclick', e => e.waitUntil(onClick(e)))
