@@ -88,7 +88,9 @@ export const store = async (state, emitter) => {
     const question = `Food diary can remind you to track your meals. 
       You can always change your preference in the options, should you change 
       your mind. Do you want to set up notifications now?`
-    const wantsNotifications = await defer(resolve => emit(addMessage, { resolve, icon: i.cellphoneMessage, choices, question }))
+    const wantsNotifications = await defer(resolve => {
+      emit(addMessage, { resolve, icon: i.cellphoneMessage, choices, question })
+    })
     if (wantsNotifications !== choices[0]) return reject()
     emit(enableNotifications, { resolve, reject })
     resolve(true)
