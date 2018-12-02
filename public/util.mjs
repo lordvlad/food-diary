@@ -1,4 +1,4 @@
-/* globals atob, Image */
+/* globals Image, location */
 
 const { keys, assign } = Object
 
@@ -87,3 +87,7 @@ export const assignDeep = (target, ...args) => {
 }
 
 export const later = fn => setTimeout(fn, 100)
+
+export const offline = _ => navigator.serviceWorker.register('./sw.js')
+export const expose = (state, emitter) => { window.app = { state, emitter } }
+export const reloader = (_, e) => e.on(reload, () => location.reload())
