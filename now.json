@@ -2,7 +2,7 @@
     "version": 2,
     "name": "food-diary",
     "alias": "food-diary.now.sh",
-    "regions": ["bru1"],
+    "regions": ["bru"],
     "builds": [
         {"src": "public/**/*", "use": "@now/static"},
         {"src": "api/**", "use": "@now/node"}
