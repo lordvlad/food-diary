@@ -67,7 +67,7 @@ export const store = async (state, emitter) => {
     reg.sync.register('unsubscribe')
   })
 
-  on(checkSubscription, async state => {
+  on(checkSubscription, async _ => {
     if (!state.options.wantsNotifications) return
     const reg = await navigator.serviceWorker.ready
     reg.sync.register('checkSubscription')

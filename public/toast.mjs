@@ -1,5 +1,7 @@
-import { swMessage, autobind, render, html } from './util.mjs'
+import { autobind, render, html } from './util.mjs'
+import { events as pwaEvents } from './pwa.mjs'
 
+const { swMessage } = pwaEvents
 const toast = 'toast'
 
 export const events = { toast }

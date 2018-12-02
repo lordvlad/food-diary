@@ -4,7 +4,6 @@ const { keys, assign } = Object
 
 export const defer = (fn) => new Promise(fn)
 
-export const swMessage = 'swMessage'
 export const reload = 'reload'
 export const render = 'render'
 export const hidden = 'is-hidden'
@@ -88,10 +87,5 @@ export const assignDeep = (target, ...args) => {
 }
 
 export const later = fn => setTimeout(fn, 100)
-
-export const offline = _ => navigator.serviceWorker.register('./sw.js')
 export const expose = (state, emitter) => { window.app = { state, emitter } }
 export const reloader = (_, e) => e.on(reload, () => location.reload())
-export const swMessages = (_, emitter) => {
-  navigator.serviceWorker.addEventListener('message', e => emitter.emit(swMessage, e.data))
-}
