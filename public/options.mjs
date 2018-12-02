@@ -93,7 +93,6 @@ export const store = async (state, emitter) => {
     })
     if (wantsNotifications !== choices[0]) return reject()
     emit(enableNotifications, { resolve, reject })
-    resolve(true)
   })
 
   later(async _ => {
