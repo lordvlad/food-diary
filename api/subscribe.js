@@ -2,7 +2,7 @@ const { json, send } = require('micro')
 const { store, load } = require('./store')
 const fetchModule = require('node-fetch')
 const { APP_URL } = process.env
-const fetch = fetchModule && fetchModule.default || fetchModule
+const fetch = fetchModule.default || fetchModule
 
 module.exports = async (req, res) => {
   try {
