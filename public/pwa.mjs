@@ -23,7 +23,7 @@ export const store = async (_, emitter) => {
     } else if (registration.installing) {
       // new worker in installation phase
       registration.installing.addEventListener('statechange', _ => {
-        if (registration.installing.state === 'activated') updated()
+        if (registration.installing && registration.installing.state === 'activated') updated()
       })
     } else {
       console.error('ran into unhandled state')

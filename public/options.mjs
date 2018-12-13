@@ -1,4 +1,5 @@
 /* global Notification, fetch */
+import fromNow from 'https://unpkg.com/fromnow@3.0.0/dist/fromnow.mjs'
 import { later, render, raw, autobind,
   hidden, html, i, defer } from './util.mjs'
 import { events as assistantEvents } from './assistant.mjs'
@@ -18,6 +19,7 @@ const setSetupComplete = 'setSetupComplete'
 const loadComplete = 'loadComplete'
 const askForNotifications = 'askForNotifications'
 const checkSubscription = 'checkSubscription'
+const getLastTick = 'getLastTick'
 
 export const events = {
   setName,
@@ -35,7 +37,8 @@ export const store = async (state, emitter) => {
   const options = {
     name: '',
     wantsNotifications: false,
-    setupComplete: false
+    setupComplete: false,
+    lastTick: null
   }
 
   assign(state, { options })
@@ -60,6 +63,12 @@ export const store = async (state, emitter) => {
   on(update, async _ => {
     const reg = await navigator.serviceWorker.ready
     reg.update()
+  })
+
+  on(getLastTick, async _ => {
+    options.lastTick = Number(await (await fetch('/last-tick')).text())
+    if (Number.isNaN(options.lastTick)) options.lastTick = -1
+    emit(render)
   })
 
   on(disableNotifications, async _ => {
@@ -143,6 +152,12 @@ export const view = ({ tabs, options }, emit) => html`
       <p>Reset all user data</p>
       <p>
         <button onclick=${() => emit(reset)} class="button error">reset</button>
+      </p>
+    </p>
+    <p class=card>
+      <p>
+        Last notification from backend
+        ${options.lastTick ? fromNow(options.lastTick) : (emit(getLastTick) && '...')}
       </p>
     </p>
     <p class=card>

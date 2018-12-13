@@ -14,6 +14,7 @@ const staleWhileRevalidate = strategies.staleWhileRevalidate.bind(strategies)
 const cacheFirst = strategies.cacheFirst.bind(strategies)
 
 let publicKey = null
+let lastCronTick = 0
 
 core.setLogLevel(core.LOG_LEVELS.error)
 
@@ -106,6 +107,7 @@ const onClick = async e => {
 const onPush = async () => {
   console.log('woke up because of a push notification')
   const dateOfArrival = Date.now()
+  lastCronTick = dateOfArrival
   const tag = 'entry'
   const icon = 'img/icon-128.png'
   const data = { dateOfArrival, primaryKey: '2' }
@@ -202,11 +204,12 @@ addEventListener('activate', e => e.waitUntil(onActivate(e)))
 addEventListener('install', e => e.waitUntil(onInstall(e)))
 addEventListener('sync', e => e.waitUntil(onSync(e)))
 
-registerRoute(/.*\.(json|mjs|js|css|html).*/, staleWhileRevalidate())
-registerRoute(/.*\.(svg|png).*/, cacheFirst())
+registerRoute(/\/last-tick/, _ => lastCronTick, 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'POST')
 registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'POST')
 registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'DELETE')
 registerRoute('/', cacheFirst())
+registerRoute(/.*\.(json|mjs|js|css|html).*/, staleWhileRevalidate())
+registerRoute(/.*\.(svg|png).*/, cacheFirst())
