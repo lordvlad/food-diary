@@ -14,7 +14,7 @@ const staleWhileRevalidate = strategies.staleWhileRevalidate.bind(strategies)
 const cacheFirst = strategies.cacheFirst.bind(strategies)
 
 let publicKey = null
-let lastCronTick = 0
+let lastCronTick = 1
 
 core.setLogLevel(core.LOG_LEVELS.error)
 
