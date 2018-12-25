@@ -11,7 +11,7 @@ const load = async _ => {
 const store = async subscriptions => {
   const body = stringify(subscriptions)
   const response = await fetch(storeUrl, { method: 'POST', body })
-  if (!response.ok) throw new Error(response.statusText)
+  if (!response.ok) throw new Error(`posting '${body}' to '${storeUrl}' returned '${response.statusText}'`)
 }
 
 module.exports = { store, load }
