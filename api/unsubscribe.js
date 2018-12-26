@@ -1,15 +1,18 @@
 const { json, send } = require('micro')
-const { store, load } = require('./store')
+const store = require('../lib/store')
+var crypto = require('crypto')
+const hash = str => crypto.createHash('md5').update(str).digest('hex')
 
 module.exports = async (req, res) => {
   try {
     const { endpoint } = await json(req)
-    const filter = s => s.endpoint !== endpoint
-    await store((await load()).filter(filter))
-    console.log(`/unsubscribe [-]    ${endpoint.substr(0, 64)} unsubscribed`)
+    if (!endpoint) return send(res, 400, 'request is missing the "endpoint" property')
+    const documentId = hash(endpoint)
+    await store.collection('subscriptions').doc(documentId).delete()
+    console.log(`/unsubscribe [INFO] ${endpoint.substr(0, 64)} unsubscribed`)
     send(res, 200)
   } catch (e) {
-    console.error(`/unsubscribe [FAIL] ${e.stack}`)
+    console.error(`/unsubscribe [ERROR] ${e.stack}`)
     send(res, 500)
   }
 }

@@ -3,3 +3,4 @@ node_modules
 certs
 *lock.json
 *config.js
+private_key.json

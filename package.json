@@ -5,8 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js",
-    "start": "node index.js",
     "stage": "now",
     "prod": "now && now alias",
     "configure": "node configure.js"
@@ -23,6 +21,7 @@
   "homepage": "https://github.com/lordvlad/food-diary#readme",
   "dependencies": {
     "@lordvlad/web-push": "^3.4.1",
+    "googleapis": "^36.0.0",
     "micro": "^9.3.3",
     "node-fetch": "^2.3.0",
     "rollup-plugin-commonjs": "^9.2.0",
