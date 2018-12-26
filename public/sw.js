@@ -204,7 +204,7 @@ addEventListener('activate', e => e.waitUntil(onActivate(e)))
 addEventListener('install', e => e.waitUntil(onInstall(e)))
 addEventListener('sync', e => e.waitUntil(onSync(e)))
 
-registerRoute(/\/last-tick/, _ => lastCronTick, 'GET')
+registerRoute(/\/last-tick/, _ => new Response(lastCronTick, { status: 200 }), 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'GET')
 registerRoute(/\/store\/(?<store>[^/]+)\/(?<id>.+)/, storeHandler, 'POST')
 registerRoute(/\/store\/(?<store>[^/]+)/, storeHandler, 'GET')
